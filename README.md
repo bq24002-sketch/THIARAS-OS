@@ -424,3 +424,7 @@ Licencia
 
 Consulta el archivo LICENSE incluido en el repositorio para conocer los términos de uso del proyecto.
 
+<<<<<<< HEAD
+=======
+La aplicacion inicia en modo escritorio con `mvn javafx:run`. Incluye dashboard, acciones de iniciar y completar, notificaciones pendientes y formulario de nueva actividad. El motor de correos se inicia aparte con `--recordatorios` y consulta PostgreSQL en cada ciclo; `horario.json` ya no es la fuente de recordatorios en ejecucion.
+>>>>>>> e588f61 (adjunto lógica de integración)

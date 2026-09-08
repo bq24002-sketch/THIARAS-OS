@@ -26,7 +26,7 @@ public class MotorRecordatorios {
      */
     private static final long HORAS_MAXIMAS_RECUPERACION = 24;
 
-    private final Agenda agenda;
+    private final ProveedorAgenda proveedorAgenda;
     private final ServicioCorreo servicioCorreo;
     private final RegistroEjecuciones registro;
 
@@ -43,7 +43,16 @@ public class MotorRecordatorios {
             RegistroEjecuciones registro
     ) {
 
-        this.agenda = agenda;
+        this(() -> agenda, servicioCorreo, registro);
+    }
+
+    public MotorRecordatorios(
+            ProveedorAgenda proveedorAgenda,
+            ServicioCorreo servicioCorreo,
+            RegistroEjecuciones registro
+    ) {
+
+        this.proveedorAgenda = proveedorAgenda;
         this.servicioCorreo = servicioCorreo;
         this.registro = registro;
 
@@ -57,6 +66,8 @@ public class MotorRecordatorios {
      * deben ejecutarse o recuperarse.
      */
     public void ejecutar() {
+
+        Agenda agenda = proveedorAgenda.cargar();
 
         LocalDateTime ahora =
                 LocalDateTime.now();
@@ -420,6 +431,8 @@ public class MotorRecordatorios {
     ) {
 
         return momentoRecordatorio.toLocalDate()
+                + "|"
+                + actividad.getId()
                 + "|"
                 + actividad.getDia()
                 + "|"

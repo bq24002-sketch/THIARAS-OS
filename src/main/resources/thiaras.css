@@ -1,0 +1,23 @@
+.root {
+    -fx-font-family: "Segoe UI";
+    -fx-background-color: #f6f7f8;
+    -fx-text-fill: #17212b;
+}
+.tool-bar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent #d9dfe5 transparent;
+    -fx-padding: 12 20 12 20;
+}
+.marca { -fx-font-size: 20px; -fx-font-weight: 700; }
+.seccion { -fx-text-fill: #5d6873; -fx-padding: 2 0 0 14; }
+.titulo-seccion { -fx-font-size: 16px; -fx-font-weight: 700; }
+.metrica { -fx-padding: 12 18 12 0; }
+.metrica .label:first-child { -fx-font-size: 11px; -fx-text-fill: #687783; }
+.metrica .label:last-child { -fx-font-size: 19px; -fx-font-weight: 700; }
+.button { -fx-background-radius: 4; -fx-border-radius: 4; -fx-padding: 7 11 7 11; }
+.primario { -fx-background-color: #146c66; -fx-text-fill: white; }
+.table-view { -fx-background-color: white; -fx-border-color: #d9dfe5; -fx-border-radius: 4; }
+.table-view .column-header-background { -fx-background-color: #edf1f3; }
+.table-view .column-header { -fx-background-color: transparent; -fx-font-weight: 700; }
+.pie { -fx-background-color: #ffffff; -fx-text-fill: #5d6873; }
+.error-formulario { -fx-text-fill: #b42318; }
