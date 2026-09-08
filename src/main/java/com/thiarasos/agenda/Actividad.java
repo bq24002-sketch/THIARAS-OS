@@ -5,6 +5,8 @@ import java.time.LocalTime;
 
 public class Actividad {
 
+    private final long id;
+
     private final DayOfWeek dia;
 
     private final LocalTime hora;
@@ -23,6 +25,7 @@ public class Actividad {
 
 
     public Actividad(
+            long id,
             DayOfWeek dia,
             LocalTime hora,
             String materia,
@@ -33,6 +36,7 @@ public class Actividad {
             int minutosAnticipacion
     ) {
 
+        this.id = id;
         this.dia = dia;
         this.hora = hora;
         this.materia = materia;
@@ -41,6 +45,15 @@ public class Actividad {
         this.duracion = duracion;
         this.tipo = tipo;
         this.minutosAnticipacion = minutosAnticipacion;
+    }
+
+    public Actividad(DayOfWeek dia, LocalTime hora, String materia, String titulo,
+                     String contenido, String duracion, TipoActividad tipo, int minutosAnticipacion) {
+        this(0, dia, hora, materia, titulo, contenido, duracion, tipo, minutosAnticipacion);
+    }
+
+    public long getId() {
+        return id;
     }
 
 

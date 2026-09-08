@@ -343,7 +343,7 @@ final class PanelPrincipal {
             return new NuevaActividad(
                     titulo.getText().trim(), materia.getText().trim(), contenido.getText().trim(),
                     minutos.getValue(), tipo.getValue(), inicio.getValue(), vencimiento.getValue(), horaActividad,
-                    recurrente.isSelected(), anticipacion.getValue()
+                    recurrente.isSelected(), inicio.getValue().getDayOfWeek().getValue(), anticipacion.getValue()
             );
         }
     }

@@ -12,5 +12,9 @@ public enum TipoActividad {
 
     NEGOCIO,
     PROYECTO,
-    ESCRITURA
+    ESCRITURA,
+    PERSONAL,
+    ENTREGA,
+    EXAMEN,
+    REUNION
 }

@@ -1,7 +1,7 @@
 package com.thiarasos;
 
 import com.thiarasos.agenda.Agenda;
-import com.thiarasos.agenda.CargadorAgenda;
+import com.thiarasos.agenda.CargadorAgendaBaseDatos;
 import com.thiarasos.agenda.MotorRecordatorios;
 import com.thiarasos.consola.ConsolaBaseDatos;
 import com.thiarasos.desktop.AplicacionThiaras;
@@ -10,6 +10,7 @@ import com.thiarasos.config.Configuracion;
 import com.thiarasos.registro.RegistroEjecuciones;
 import com.thiarasos.estado.GestorPendientes;
 import com.thiarasos.servicio.ServiciosPersistencia;
+import com.thiarasos.persistencia.ConexionPostgres;
 
 public class Main {
 
@@ -69,8 +70,10 @@ public class Main {
         // CARGAR AGENDA
         // =====================================================
 
-        CargadorAgenda cargador =
-                new CargadorAgenda();
+        CargadorAgendaBaseDatos cargador =
+                new CargadorAgendaBaseDatos(
+                        new ConexionPostgres(configuracion)
+                );
 
         Agenda agenda =
                 cargador.cargar();
@@ -107,9 +110,9 @@ gestorPendientes.mostrarEstado();
 // MOTOR DE RECORDATORIOS
 // =====================================================
 
-MotorRecordatorios motor =
+        MotorRecordatorios motor =
         new MotorRecordatorios(
-                agenda,
+                cargador,
                 servicioCorreo,
                 registro
         );

@@ -96,6 +96,10 @@ public final class RepositorioActividad {
                 INSERT INTO recordatorio (actividad_id, minutos_anticipacion, activo)
                 VALUES (?, ?, TRUE)
                 """;
+        String crearRecurrencia = """
+                INSERT INTO recurrencia (actividad_id, tipo, intervalo, dia_semana)
+                VALUES (?, 'SEMANAL', 1, ?)
+                """;
 
         try (var conexion = proveedorConexion.abrir()) {
             conexion.setAutoCommit(false);
@@ -128,6 +132,14 @@ public final class RepositorioActividad {
                     consulta.setLong(1, actividadId);
                     consulta.setInt(2, actividad.minutosAnticipacion());
                     consulta.executeUpdate();
+                }
+
+                if (actividad.recurrente()) {
+                    try (PreparedStatement consulta = conexion.prepareStatement(crearRecurrencia)) {
+                        consulta.setLong(1, actividadId);
+                        consulta.setInt(2, actividad.diaSemana());
+                        consulta.executeUpdate();
+                    }
                 }
 
                 conexion.commit();

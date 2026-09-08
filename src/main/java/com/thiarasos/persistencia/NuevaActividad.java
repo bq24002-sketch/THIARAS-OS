@@ -13,6 +13,7 @@ public record NuevaActividad(
         LocalDate fechaVencimiento,
         LocalTime hora,
         boolean recurrente,
+        int diaSemana,
         int minutosAnticipacion
 ) {
 }
