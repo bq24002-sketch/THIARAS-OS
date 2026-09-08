@@ -1,0 +1,3 @@
+CREATE DATABASE thiaras_os
+WITH
+    ENCODING = 'UTF8';

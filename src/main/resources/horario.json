@@ -1,0 +1,82 @@
+[
+  {
+    "dia": "SUNDAY",
+    "hora": "09:00",
+    "titulo": "Micro-sesión",
+    "materia": "Programación",
+    "contenido": "Revisar conceptos pendientes de Java.",
+    "duracion": "30 minutos",
+    "tipo": "ESTUDIO",
+    "minutosAnticipacion": 0
+  },
+  {
+    "dia": "SUNDAY",
+    "hora": "12:00",
+    "titulo": "Lectura técnica",
+    "materia": "Ingeniería de Software",
+    "contenido": "Leer documentación y tomar notas.",
+    "duracion": "45 minutos",
+    "tipo": "ESTUDIO",
+    "minutosAnticipacion": 0
+  },
+  {
+    "dia": "SUNDAY",
+    "hora": "18:30",
+    "titulo": "Activación Física",
+    "materia": "Entrenamiento",
+    "contenido": "Sesión de actividad física.",
+    "duracion": "40 minutos",
+    "tipo": "EJERCICIO",
+    "minutosAnticipacion": 0
+  },
+  {
+    "dia": "MONDAY",
+    "hora": "08:20",
+    "titulo": "Manejo de Estructura de Datos",
+    "materia": "Estructura de Datos",
+    "contenido": "Sesión síncrona.",
+    "duracion": "90 minutos",
+    "tipo": "SINCRONA",
+    "minutosAnticipacion": 0
+  },
+  {
+    "dia": "MONDAY",
+    "hora": "11:00",
+    "titulo": "Thiaras Demirff",
+    "materia": "Escritura",
+    "contenido": "Ambientar capítulo.",
+    "duracion": "60 minutos",
+    "tipo": "PROYECTO",
+    "minutosAnticipacion": 0
+  },
+  {
+    "dia": "TUESDAY",
+    "hora": "10:00",
+    "titulo": "Desarrollo THIARAS OS",
+    "materia": "Java",
+    "contenido": "Continuar desarrollo del sistema.",
+    "duracion": "120 minutos",
+    "tipo": "PROYECTO",
+    "minutosAnticipacion": 0
+  },
+  {
+    "dia": "WEDNESDAY",
+    "hora": "15:00",
+    "titulo": "Revisión de proyecto",
+    "materia": "Ingeniería de Software",
+    "contenido": "Revisar avances y pendientes.",
+    "duracion": "60 minutos",
+    "tipo": "PROYECTO",
+    "minutosAnticipacion": 0
+  },
+  {
+    "dia": "SATURDAY",
+    "hora": "09:00",
+    "titulo": "Plan de Negocios",
+    "materia": "Plan de Negocios",
+    "contenido": "Trabajar en el desarrollo del plan de negocios.",
+    "duracion": "120 minutos",
+    "tipo": "NEGOCIO",
+    "minutosAnticipacion": 0
+  }
+]
