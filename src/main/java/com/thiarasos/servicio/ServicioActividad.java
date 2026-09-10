@@ -1,5 +1,6 @@
 package com.thiarasos.servicio;
 
+import com.thiarasos.persistencia.ActividadEditable;
 import com.thiarasos.persistencia.EstadoActividad;
 import com.thiarasos.persistencia.EstadoAplicacion;
 import com.thiarasos.persistencia.RepositorioActividad;
@@ -48,12 +49,27 @@ public final class ServicioActividad {
     public List<TipoActividadBaseDatos> listarTipos() {
         return actividades.listarTipos();
     }
+    
+    public boolean existeConflictoHorario(NuevaActividad actividad) {
+        return actividades.existeConflictoHorario(actividad);
+    }
 
     public EstadoAplicacion crearYRefrescar(NuevaActividad actividad) {
         actividades.crear(actividad);
         return refrescar();
     }
+    
+    public ActividadEditable obtenerParaEdicion(long actividadId) {
+    return actividades.obtenerParaEdicion(actividadId);
+    }
 
+    public EstadoAplicacion modificarYRefrescar(
+        long actividadId,
+        NuevaActividad actividad
+    ){
+    actividades.modificar(actividadId, actividad);
+    return refrescar();
+    }
     public EstadoAplicacion refrescar() {
         return new EstadoAplicacion(
                 actividades.listarParaInterfaz(),
