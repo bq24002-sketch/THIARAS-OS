@@ -6,7 +6,7 @@
 
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Java-17%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" height="42">
+  <img src="https://img.shields.io/badge/Java-25-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" height="42">
   <img src="https://img.shields.io/badge/PostgreSQL-17-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" height="42">
   <img src="https://img.shields.io/badge/PL%2FpgSQL-PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" height="42">
   <img src="https://img.shields.io/badge/Maven-Build-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white" height="42">
@@ -14,6 +14,7 @@
   <img src="https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white" height="42">
   <img src="https://img.shields.io/badge/CSS-Style-1572B6?style=for-the-badge&logo=css3&logoColor=white" height="42">
 </p>
+
 
 
 THIARAS OS es un proyecto de software orientado a la organización, seguimiento y análisis de actividades personales. El sistema utiliza PostgreSQL como núcleo de persistencia y lógica de negocio, con Java como capa de aplicación e interfaz.
