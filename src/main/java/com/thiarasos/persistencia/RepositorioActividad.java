@@ -14,10 +14,10 @@ public final class RepositorioActividad {
     private static final String CONSULTA_ACTIVIDADES = ConsultaSql.cargar("32_actividades_interfaz.sql");
     
     private static final String CONSULTA_CONFLICTO = """
-        SELECT actividad_id, titulo, dia_semana, inicio, fin
-        FROM existe_conflicto_horario(?, ?, ?, ?, ?, ?)
-        LIMIT 1
-        """;
+    SELECT actividad_id, titulo, dia_semana, inicio, fin
+    FROM existe_conflicto_horario(?, ?, ?, ?, ?, ?, ?)
+    LIMIT 1
+    """;
     private static final String CONSULTA_HORARIOS_OCUPADOS = """
     SELECT
         a.id AS actividad_id,
@@ -144,13 +144,22 @@ public final class RepositorioActividad {
         );
     }
 }
-    public boolean existeConflictoHorario(NuevaActividad actividad) {
-    if (actividad.hora() == null || actividad.duracionMinutos() == null) {
+ public boolean existeConflictoHorario(NuevaActividad actividad) {
+    return existeConflictoHorario(actividad, null);
+}
+
+public boolean existeConflictoHorario(
+        NuevaActividad actividad,
+        Long actividadExcluir
+) {
+    if (actividad.hora() == null
+            || actividad.duracionMinutos() == null) {
         return false;
     }
 
     try (var conexion = proveedorConexion.abrir();
-         PreparedStatement consulta = conexion.prepareStatement(CONSULTA_CONFLICTO)) {
+         PreparedStatement consulta =
+                 conexion.prepareStatement(CONSULTA_CONFLICTO)) {
 
         consulta.setObject(1, actividad.fechaInicio());
         consulta.setObject(2, actividad.fechaVencimiento());
@@ -161,7 +170,22 @@ public final class RepositorioActividad {
         if (actividad.recurrente()) {
             consulta.setInt(6, actividad.diaSemana());
         } else {
-            consulta.setNull(6, java.sql.Types.INTEGER);
+            consulta.setNull(
+                    6,
+                    java.sql.Types.INTEGER
+            );
+        }
+
+        if (actividadExcluir == null) {
+            consulta.setNull(
+                    7,
+                    java.sql.Types.BIGINT
+            );
+        } else {
+            consulta.setLong(
+                    7,
+                    actividadExcluir
+            );
         }
 
         try (ResultSet resultado = consulta.executeQuery()) {
@@ -174,7 +198,7 @@ public final class RepositorioActividad {
                 e
         );
     }
-}
+}   
 
 public ActividadEditable obtenerParaEdicion(long actividadId) {
 
@@ -309,7 +333,11 @@ public ActividadEditable obtenerParaEdicion(long actividadId) {
     try (var conexion = proveedorConexion.abrir()) {
 
         conexion.setAutoCommit(false);
-
+        validarConflictoHorario(
+        conexion,
+        actividad,
+        actividadId
+        );
         try (
             PreparedStatement actualizarActividad =
                     conexion.prepareStatement(sqlActividad);
@@ -504,7 +532,11 @@ public ActividadEditable obtenerParaEdicion(long actividadId) {
     conexion.setAutoCommit(false);
     try {
 
-        validarConflictoHorario(conexion, actividad);
+        validarConflictoHorario(
+        conexion,
+        actividad,
+        null
+        );
 
         long actividadId;
                 try (PreparedStatement consulta = conexion.prepareStatement(crearActividad)) {
@@ -558,32 +590,86 @@ public ActividadEditable obtenerParaEdicion(long actividadId) {
     }
     private void validarConflictoHorario(
         java.sql.Connection conexion,
-        NuevaActividad actividad
+        NuevaActividad actividad,
+        Long actividadExcluir
 ) throws SQLException {
 
-    if (actividad.hora() == null || actividad.duracionMinutos() == null) {
+    if (actividad.hora() == null
+            || actividad.duracionMinutos() == null) {
         return;
     }
 
-    try (PreparedStatement consulta = conexion.prepareStatement(CONSULTA_CONFLICTO)) {
+    try (PreparedStatement consulta =
+                 conexion.prepareStatement(CONSULTA_CONFLICTO)) {
 
-        consulta.setObject(1, actividad.fechaInicio());
-        consulta.setObject(2, actividad.fechaVencimiento());
-        consulta.setObject(3, actividad.hora());
-        consulta.setInt(4, actividad.duracionMinutos());
-        consulta.setBoolean(5, actividad.recurrente());
+        consulta.setObject(
+                1,
+                actividad.fechaInicio()
+        );
+
+        consulta.setObject(
+                2,
+                actividad.fechaVencimiento()
+        );
+
+        consulta.setObject(
+                3,
+                actividad.hora()
+        );
+
+        consulta.setInt(
+                4,
+                actividad.duracionMinutos()
+        );
+
+        consulta.setBoolean(
+                5,
+                actividad.recurrente()
+        );
 
         if (actividad.recurrente()) {
-            consulta.setInt(6, actividad.diaSemana());
+            consulta.setInt(
+                    6,
+                    actividad.diaSemana()
+            );
         } else {
-            consulta.setNull(6, java.sql.Types.INTEGER);
+            consulta.setNull(
+                    6,
+                    java.sql.Types.INTEGER
+            );
         }
 
-        try (ResultSet resultado = consulta.executeQuery()) {
+        if (actividadExcluir == null) {
+            consulta.setNull(
+                    7,
+                    java.sql.Types.BIGINT
+            );
+        } else {
+            consulta.setLong(
+                    7,
+                    actividadExcluir
+            );
+        }
+
+        try (ResultSet resultado =
+                     consulta.executeQuery()) {
+
             if (resultado.next()) {
-                String titulo = resultado.getString("titulo");
-                LocalTime inicio = resultado.getObject("inicio", LocalTime.class);
-                LocalTime fin = resultado.getObject("fin", LocalTime.class);
+
+                String titulo =
+                        resultado.getString("titulo");
+
+                LocalTime inicio =
+                        resultado.getObject(
+                                "inicio",
+                                LocalTime.class
+                        );
+
+                LocalTime fin =
+                        resultado.getObject(
+                                "fin",
+                                LocalTime.class
+                        );
 
                 throw new ErrorPersistencia(
                         "Horario ocupado: la actividad se cruza con \""
@@ -594,11 +680,11 @@ public ActividadEditable obtenerParaEdicion(long actividadId) {
                                 + fin
                                 + ").",
                         null
-                );
+                   );
+                }
             }
         }
     }
-}
     private long ejecutarFuncionConResultado(String funcion, long actividadId) {
         try (var conexion = proveedorConexion.abrir();
              PreparedStatement consulta = conexion.prepareStatement(funcion)) {

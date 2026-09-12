@@ -26,12 +26,12 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 final class FormularioActividad {
 
     private final List<TipoActividadBaseDatos> tipos;
-    private final Predicate<NuevaActividad> existeConflictoHorario;
+    private final java.util.function.BiPredicate<NuevaActividad, Long>
+        existeConflictoHorario;
 
     private final Consumer<NuevaActividad> alGuardar;
     private final BiConsumer<Long, NuevaActividad> alModificar;
@@ -42,11 +42,14 @@ final class FormularioActividad {
     // CONSTRUCTOR PARA NUEVA ACTIVIDAD
     // =========================================================
 
+
     FormularioActividad(
-            List<TipoActividadBaseDatos> tipos,
-            Predicate<NuevaActividad> existeConflictoHorario,
-            Consumer<NuevaActividad> alGuardar
-    ) {
+        List<TipoActividadBaseDatos> tipos,
+        java.util.function.BiPredicate<NuevaActividad, Long>
+                existeConflictoHorario,
+        Consumer<NuevaActividad> alGuardar
+    )
+    {
         this.tipos = tipos;
         this.existeConflictoHorario = existeConflictoHorario;
         this.alGuardar = alGuardar;
@@ -59,11 +62,13 @@ final class FormularioActividad {
     // =========================================================
 
     FormularioActividad(
-            List<TipoActividadBaseDatos> tipos,
-            Predicate<NuevaActividad> existeConflictoHorario,
-            ActividadEditable actividadEditar,
-            BiConsumer<Long, NuevaActividad> alModificar
-    ) {
+        List<TipoActividadBaseDatos> tipos,
+        java.util.function.BiPredicate<NuevaActividad, Long>
+                existeConflictoHorario,
+        ActividadEditable actividadEditar,
+        BiConsumer<Long, NuevaActividad> alModificar
+     ) 
+     {
         this.tipos = tipos;
         this.existeConflictoHorario = existeConflictoHorario;
         this.alGuardar = null;
@@ -485,9 +490,12 @@ final class FormularioActividad {
                     try {
 
                         boolean conflicto =
-                                existeConflictoHorario.test(
-                                        actividad
-                                );
+                        existeConflictoHorario.test(
+                                      actividad,
+                                       editando
+                                ? actividadEditar.id()
+                                : null
+                                       );
 
                         if (conflicto) {
 

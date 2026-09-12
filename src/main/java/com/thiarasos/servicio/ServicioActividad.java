@@ -53,7 +53,15 @@ public final class ServicioActividad {
     public boolean existeConflictoHorario(NuevaActividad actividad) {
         return actividades.existeConflictoHorario(actividad);
     }
-
+    public boolean existeConflictoHorario(
+        NuevaActividad actividad,
+        Long actividadExcluir
+    ) {
+    return actividades.existeConflictoHorario(
+            actividad,
+            actividadExcluir
+    );
+    }
     public EstadoAplicacion crearYRefrescar(NuevaActividad actividad) {
         actividades.crear(actividad);
         return refrescar();
