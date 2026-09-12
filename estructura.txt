@@ -5,23 +5,67 @@ THIARAS-OS/
 │
 ├── data/
 │   └── database/
+│       │
 │       ├── install.sql
 │       │
 │       ├── ddl/
-│       │   ├── 01_crear_tablas.sql
-│       │   ├── 02_crear_restricciones.sql
-│       │   ├── 03_crear_indices.sql
-│       │   ├── ...
-│       │   ├── 14_crear_funcion_existe_conflicto.sql
-│       │   └── ...
+│       │   │
+│       │   ├── 01_create_database.sql
+│       │   ├── 02_create_tables.sql
+│       │   ├── 03_constraints.sql
+│       │   ├── 04_indexes.sql
+│       │   ├── 05_crear_cumplimiento.sql
+│       │   ├── 06_crear_objetivo.sql
+│       │   ├── 07_crear_logro.sql
+│       │   ├── 08_crear_notificacion.sql
+│       │   ├── 09_crear_funcion_procesar_cumplimiento.sql
+│       │   ├── 10_crear_funcion_iniciar_actividad.sql
+│       │   ├── 11_crear_funcion_completar_actividad.sql
+│       │   ├── 12_crear_funcion_marcar_notificacion_leida.sql
+│       │   ├── 13_crear_funcion_estado_actividad.sql
+│       │   └── 14_crear_funcion_existe_conflicto.sql
+│       │
+│       ├── dml/
+│       │   │
+│       │   ├── 01_insert_tipos.sql
+│       │   ├── 02_insert_actividades.sql
+│       │   ├── 03_insert_recurrencias.sql
+│       │   └── 04_insert_recordatorios.sql
 │       │
 │       └── queries/
-│           ├── 01_*.sql
-│           ├── 02_*.sql
-│           ├── ...
-│           ├── 26_*.sql
-│           ├── 27_*.sql
-│           ├── ...
+│           │
+│           ├── 01_agenda_hoy.sql
+│           ├── 02_agenda_proxima.sql
+│           ├── 03_actividades_vencimiento.sql
+│           ├── 04_recordatorios.sql
+│           ├── 05_historial.sql
+│           ├── 06_crear_actividad.sql
+│           ├── 07_modificar_actividad.sql
+│           ├── 08_desactivar_actividad.sql
+│           ├── 09_eliminar_actividad.sql
+│           ├── 10_iniciar_actividad.sql
+│           ├── 11_completar_actividad.sql
+│           ├── 12_estadisticas_actividad.sql
+│           ├── 13_resumen_semanal.sql
+│           ├── 14_resumen_mensual.sql
+│           ├── 15_crear_objetivo.sql
+│           ├── 16_progreso_objetivo.sql
+│           ├── 17_progreso_objetivos.sql
+│           ├── 18_crear_objetivo_actividades.sql
+│           ├── 19_crear_logros.sql
+│           ├── 20_evaluar_logros.sql
+│           ├── 21_estado_logros.sql
+│           ├── 22_generar_notificacion_logro.sql
+│           ├── 23_marcar_notificacion_leida.sql
+│           ├── 24_notificaciones_pendientes.sql
+│           ├── 25_crear_notificacion_prueba.sql
+│           ├── 26_resumen_notificaciones.sql
+│           ├── 27_actividades_hoy.sql
+│           ├── 28_resumen_progreso.sql
+│           ├── 29_estado_logros.sql
+│           ├── 30_notificaciones_pendientes.sql
+│           ├── 31_dashboard.sql
+│           ├── 32_actividades_interfaz.sql
 │           └── 33_conflicto_horario.sql
 │
 └── src/
@@ -48,25 +92,21 @@ THIARAS-OS/
         │           │   ├── AplicacionThiaras.java
         │           │   ├── EstadoAplicacion.java
         │           │   ├── FormularioActividad.java
-        │           │   ├── PanelPrincipal.java
-        │           │   └── ...
+        │           │   └── PanelPrincipal.java
         │           │
         │           ├── modelo/
         │           │   ├── ActividadInterfaz.java
         │           │   ├── ActividadEditable.java
         │           │   ├── NuevaActividad.java
-        │           │   ├── NotificacionPendiente.java
-        │           │   └── ...
+        │           │   └── NotificacionPendiente.java
         │           │
         │           ├── persistencia/
         │           │   ├── ConexionPostgres.java
         │           │   ├── ProveedorConexion.java
         │           │   ├── ErrorPersistencia.java
-        │           │   │
         │           │   ├── RepositorioActividad.java
         │           │   ├── RepositorioDashboard.java
-        │           │   ├── RepositorioNotificacion.java
-        │           │   └── ...
+        │           │   └── RepositorioNotificacion.java
         │           │
         │           └── servicio/
         │               ├── ServicioActividad.java
@@ -74,6 +114,4 @@ THIARAS-OS/
         │
         └── resources/
             ├── config.properties
-            ├── horario.json
-            │
-            └── [otros recursos]
+            └── horario.json
