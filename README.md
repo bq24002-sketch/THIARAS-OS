@@ -13,8 +13,9 @@
   <img src="https://img.shields.io/badge/Git-Version_Control-F05032?style=for-the-badge&logo=git&logoColor=white" height="42">
   <img src="https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white" height="42">
   <img src="https://img.shields.io/badge/CSS-Style-1572B6?style=for-the-badge&logo=css3&logoColor=white" height="42">
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" height="42">
 </p>
-
+ 
 
 
 THIARAS OS es un proyecto de software orientado a la organización, seguimiento y análisis de actividades personales. El sistema utiliza PostgreSQL como núcleo de persistencia y lógica de negocio, con Java como capa de aplicación e interfaz.
