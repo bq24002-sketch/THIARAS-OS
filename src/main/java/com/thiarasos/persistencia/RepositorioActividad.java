@@ -200,6 +200,7 @@ public boolean existeConflictoHorario(
     }
 }   
 
+
 public ActividadEditable obtenerParaEdicion(long actividadId) {
 
     String sql = """
@@ -214,18 +215,7 @@ public ActividadEditable obtenerParaEdicion(long actividadId) {
             a.fecha_vencimiento,
             a.hora,
             a.recurrente,
-            COALESCE(r.dia_semana, 0) AS dia_semana,
-            COALESCE(
-                (
-                    SELECT rec.minutos_anticipacion
-                    FROM recordatorio rec
-                    WHERE rec.actividad_id = a.id
-                      AND rec.activo = TRUE
-                    ORDER BY rec.id DESC
-                    LIMIT 1
-                ),
-                0
-            ) AS minutos_anticipacion
+            COALESCE(r.dia_semana, 0) AS dia_semana
         FROM actividad a
         JOIN tipo_actividad ta
             ON ta.id = a.tipo_id
@@ -235,8 +225,22 @@ public ActividadEditable obtenerParaEdicion(long actividadId) {
           AND a.activa = TRUE
         """;
 
+    String sqlRecordatorios = """
+        SELECT
+            id,
+            minutos_anticipacion,
+            activo
+        FROM recordatorio
+        WHERE actividad_id = ?
+          AND activo = TRUE
+        ORDER BY minutos_anticipacion DESC
+        """;
+
     try (var conexion = proveedorConexion.abrir();
-         PreparedStatement consulta = conexion.prepareStatement(sql)) {
+         PreparedStatement consulta =
+                 conexion.prepareStatement(sql);
+         PreparedStatement consultaRecordatorios =
+                 conexion.prepareStatement(sqlRecordatorios)) {
 
         consulta.setLong(1, actividadId);
 
@@ -249,23 +253,63 @@ public ActividadEditable obtenerParaEdicion(long actividadId) {
                 );
             }
 
+            List<Recordatorio> recordatorios =
+                    new ArrayList<>();
+
+            consultaRecordatorios.setLong(
+                    1,
+                    actividadId
+            );
+
+            try (ResultSet resultadoRecordatorios =
+                         consultaRecordatorios.executeQuery()) {
+
+                while (resultadoRecordatorios.next()) {
+
+                    recordatorios.add(
+                            new Recordatorio(
+                                    resultadoRecordatorios.getLong("id"),
+                                    resultadoRecordatorios.getInt(
+                                            "minutos_anticipacion"
+                                    ),
+                                    resultadoRecordatorios.getBoolean(
+                                            "activo"
+                                    )
+                            )
+                    );
+                }
+            }
+
             return new ActividadEditable(
                     resultado.getLong("id"),
                     resultado.getString("titulo"),
                     resultado.getString("materia"),
                     resultado.getString("contenido"),
-                    obtenerEntero(resultado, "duracion_minutos"),
+                    obtenerEntero(
+                            resultado,
+                            "duracion_minutos"
+                    ),
                     resultado.getString("tipo"),
-                    resultado.getObject("fecha_inicio", LocalDate.class),
-                    resultado.getObject("fecha_vencimiento", LocalDate.class),
-                    resultado.getObject("hora", LocalTime.class),
+                    resultado.getObject(
+                            "fecha_inicio",
+                            LocalDate.class
+                    ),
+                    resultado.getObject(
+                            "fecha_vencimiento",
+                            LocalDate.class
+                    ),
+                    resultado.getObject(
+                            "hora",
+                            LocalTime.class
+                    ),
                     resultado.getBoolean("recurrente"),
                     resultado.getInt("dia_semana"),
-                    resultado.getInt("minutos_anticipacion")
+                    recordatorios
             );
         }
 
     } catch (SQLException e) {
+
         throw new ErrorPersistencia(
                 "No se pudo cargar la actividad para editar",
                 e
@@ -309,26 +353,20 @@ public ActividadEditable obtenerParaEdicion(long actividadId) {
         VALUES (?, 'SEMANAL', 1, ?)
         """;
 
-    String sqlRecordatorio = """
-        UPDATE recordatorio
-        SET minutos_anticipacion = ?,
-            activo = TRUE
-        WHERE actividad_id = ?
-        """;
+    String sqlDesactivarRecordatorios = """
+    UPDATE recordatorio
+    SET activo = FALSE
+    WHERE actividad_id = ?
+    """;
 
-    String sqlCrearRecordatorio = """
-        INSERT INTO recordatorio (
-            actividad_id,
-            minutos_anticipacion,
-            activo
-        )
-        SELECT ?, ?, TRUE
-        WHERE NOT EXISTS (
-            SELECT 1
-            FROM recordatorio
-            WHERE actividad_id = ?
-        )
-        """;
+String sqlCrearRecordatorio = """
+    INSERT INTO recordatorio (
+        actividad_id,
+        minutos_anticipacion,
+        activo
+    )
+    VALUES (?, ?, TRUE)
+    """;
 
     try (var conexion = proveedorConexion.abrir()) {
 
@@ -348,8 +386,8 @@ public ActividadEditable obtenerParaEdicion(long actividadId) {
             PreparedStatement crearRecurrencia =
                     conexion.prepareStatement(sqlCrearRecurrencia);
 
-            PreparedStatement actualizarRecordatorio =
-                    conexion.prepareStatement(sqlRecordatorio);
+            PreparedStatement desactivarRecordatorios =
+                    conexion.prepareStatement(sqlDesactivarRecordatorios);
 
             PreparedStatement crearRecordatorio =
                     conexion.prepareStatement(sqlCrearRecordatorio)
@@ -440,42 +478,34 @@ public ActividadEditable obtenerParaEdicion(long actividadId) {
                 crearRecurrencia.executeUpdate();
             }
 
-            // ============================================
-            // RECORDATORIO
-            // ============================================
+// ============================================
+// RECORDATORIOS
+// ============================================
 
-            actualizarRecordatorio.setInt(
-                    1,
-                    actividad.minutosAnticipacion()
-            );
+desactivarRecordatorios.setLong(
+        1,
+        actividadId
+);
 
-            actualizarRecordatorio.setLong(
-                    2,
-                    actividadId
-            );
+desactivarRecordatorios.executeUpdate();
 
-            int recordatoriosModificados =
-                    actualizarRecordatorio.executeUpdate();
+for (Integer minutos :
+        actividad.minutosAnticipacion()) {
 
-            if (recordatoriosModificados == 0) {
+    crearRecordatorio.setLong(
+            1,
+            actividadId
+    );
 
-                crearRecordatorio.setLong(
-                        1,
-                        actividadId
-                );
+    crearRecordatorio.setInt(
+            2,
+            minutos
+    );
 
-                crearRecordatorio.setInt(
-                        2,
-                        actividad.minutosAnticipacion()
-                );
+    crearRecordatorio.addBatch();
+}
 
-                crearRecordatorio.setLong(
-                        3,
-                        actividadId
-                );
-
-                crearRecordatorio.executeUpdate();
-            }
+crearRecordatorio.executeBatch();
 
             conexion.commit();
 
@@ -562,12 +592,19 @@ public ActividadEditable obtenerParaEdicion(long actividadId) {
                     }
                 }
 
-                try (PreparedStatement consulta = conexion.prepareStatement(crearRecordatorio)) {
-                    consulta.setLong(1, actividadId);
-                    consulta.setInt(2, actividad.minutosAnticipacion());
-                    consulta.executeUpdate();
-                }
+                 try (PreparedStatement consulta =
+                            conexion.prepareStatement(crearRecordatorio)) {
 
+                    for (Integer minutos :
+                            actividad.minutosAnticipacion()) {
+
+                        consulta.setLong(1, actividadId);
+                        consulta.setInt(2, minutos);
+                        consulta.addBatch();
+                    }
+
+                    consulta.executeBatch();
+                }
                 if (actividad.recurrente()) {
                     try (PreparedStatement consulta = conexion.prepareStatement(crearRecurrencia)) {
                         consulta.setLong(1, actividadId);

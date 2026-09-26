@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
+import com.thiarasos.persistencia.Recordatorio;
 
 public class CargadorAgenda {
 
@@ -45,22 +46,23 @@ public class CargadorAgenda {
             for (ActividadJSON datos : actividades) {
 
                 Actividad actividad =
-                        new Actividad(
-                                DayOfWeek.valueOf(
-                                        datos.dia
-                                ),
-                                LocalTime.parse(
-                                        datos.hora
-                                ),
-                                datos.materia,
-                                datos.titulo,
-                                datos.contenido,
-                                datos.duracion,
-                                TipoActividad.valueOf(
-                                        datos.tipo
-                                ),
-                                datos.minutosAnticipacion
-                        );
+        new Actividad(
+                0L,
+                DayOfWeek.valueOf(datos.dia),
+                LocalTime.parse(datos.hora),
+                datos.materia,
+                datos.titulo,
+                datos.contenido,
+                datos.duracion,
+                TipoActividad.valueOf(datos.tipo),
+                List.of(
+                        new Recordatorio(
+                                0L,
+                                datos.minutosAnticipacion,
+                                true
+                        )
+                )
+        ); 
 
                 agenda.agregar(actividad);
             }

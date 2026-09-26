@@ -95,48 +95,51 @@ public class GestorPendientes {
                 )
         ) {
 
-            LocalTime hora =
-                    actividad.getHoraRecordatorio();
-
-            LocalDateTime momento =
-                    LocalDateTime.of(
-                            ahora.toLocalDate(),
-                            hora
-                    );
-
-
-            if (
-                    ahora.isAfter(momento)
-                    &&
-                    !registro.yaFueProcesado(
-                            construirIdentificador(
-                                    actividad,
-                                    momento
-                            )
-                    )
+            for (
+                    LocalTime hora :
+                    actividad.getHorasRecordatorio()
             ) {
 
-                Duration atraso =
-                        Duration.between(
-                                momento,
-                                ahora
+                LocalDateTime momento =
+                        LocalDateTime.of(
+                                ahora.toLocalDate(),
+                                hora
                         );
 
-                System.out.println(
-                        "  "
-                                + hora
-                                + " | "
-                                + actividad.getTitulo()
-                );
 
-                System.out.println(
-                        "       Atrasado: "
-                                + formatearDuracion(
-                                        atraso
+                if (
+                        ahora.isAfter(momento)
+                        &&
+                        !registro.yaFueProcesado(
+                                construirIdentificador(
+                                        actividad,
+                                        momento
                                 )
-                );
+                        )
+                ) {
 
-                encontrados = true;
+                    Duration atraso =
+                            Duration.between(
+                                    momento,
+                                    ahora
+                            );
+
+                    System.out.println(
+                            "  "
+                                    + hora
+                                    + " | "
+                                    + actividad.getTitulo()
+                    );
+
+                    System.out.println(
+                            "       Atrasado: "
+                                    + formatearDuracion(
+                                            atraso
+                                    )
+                    );
+
+                    encontrados = true;
+                }
             }
         }
 
@@ -178,39 +181,42 @@ public class GestorPendientes {
                 )
         ) {
 
-            LocalTime hora =
-                    actividad.getHoraRecordatorio();
-
-            LocalDateTime momento =
-                    LocalDateTime.of(
-                            ahora.toLocalDate(),
-                            hora
-                    );
-
-
-            /*
-             * Solo mostramos actividades futuras
-             * que todavía no han sido procesadas.
-             */
-            if (
-                    ahora.isBefore(momento)
-                    &&
-                    !registro.yaFueProcesado(
-                            construirIdentificador(
-                                    actividad,
-                                    momento
-                            )
-                    )
+            for (
+                    LocalTime hora :
+                    actividad.getHorasRecordatorio()
             ) {
 
-                System.out.println(
-                        "  "
-                                + hora
-                                + " | "
-                                + actividad.getTitulo()
-                );
+                LocalDateTime momento =
+                        LocalDateTime.of(
+                                ahora.toLocalDate(),
+                                hora
+                        );
 
-                encontrados = true;
+
+                /*
+                 * Solo mostramos actividades futuras
+                 * que todavía no han sido procesadas.
+                 */
+                if (
+                        ahora.isBefore(momento)
+                        &&
+                        !registro.yaFueProcesado(
+                                construirIdentificador(
+                                        actividad,
+                                        momento
+                                )
+                        )
+                ) {
+
+                    System.out.println(
+                            "  "
+                                    + hora
+                                    + " | "
+                                    + actividad.getTitulo()
+                    );
+
+                    encontrados = true;
+                }
             }
         }
 
@@ -231,84 +237,94 @@ public class GestorPendientes {
      *
      * Muestra actividades de los próximos días.
      */
- private void mostrarProximos(
-        LocalDateTime ahora
-) {
+    private void mostrarProximos(
+            LocalDateTime ahora
+    ) {
 
-    boolean encontrados = false;
+        boolean encontrados = false;
 
-    System.out.println();
-    System.out.println(
-            "📅 PRÓXIMOS"
-    );
+        System.out.println();
+        System.out.println(
+                "📅 PRÓXIMOS"
+        );
 
-    System.out.println(
-            "------------------------------------------------------------"
-    );
+        System.out.println(
+                "------------------------------------------------------------"
+        );
 
-    LocalDate fecha =
-            ahora.toLocalDate();
+        LocalDate fecha =
+                ahora.toLocalDate();
 
-    /*
-     * Revisamos los próximos 7 días.
-     */
-    for (int i = 1; i <= 7; i++) {
 
-        LocalDate fechaProxima =
-                fecha.plusDays(i);
+        /*
+         * Revisamos los próximos 7 días.
+         */
+        for (int i = 1; i <= 7; i++) {
 
-        DayOfWeek dia =
-                fechaProxima.getDayOfWeek();
+            LocalDate fechaProxima =
+                    fecha.plusDays(i);
 
-        List<Actividad> actividades =
-                agenda.actividadesDelDia(dia);
+            DayOfWeek dia =
+                    fechaProxima.getDayOfWeek();
 
-        for (
-                Actividad actividad :
-                actividades
-        ) {
+            List<Actividad> actividades =
+                    agenda.actividadesDelDia(dia);
 
-            LocalDateTime momento =
-                    LocalDateTime.of(
-                            fechaProxima,
-                            actividad.getHoraRecordatorio()
-                    );
 
-            String identificador =
-                    construirIdentificador(
-                            actividad,
-                            momento
-                    );
-
-            if (
-                    !registro.yaFueProcesado(
-                            identificador
-                    )
+            for (
+                    Actividad actividad :
+                    actividades
             ) {
 
-                System.out.println(
-                        "  "
-                                + dia
-                                + " "
-                                + fechaProxima
-                                + " "
-                                + actividad.getHoraRecordatorio()
-                                + " | "
-                                + actividad.getTitulo()
-                );
+                for (
+                        LocalTime horaRecordatorio :
+                        actividad.getHorasRecordatorio()
+                ) {
 
-                encontrados = true;
+                    LocalDateTime momento =
+                            LocalDateTime.of(
+                                    fechaProxima,
+                                    horaRecordatorio
+                            );
+
+                    String identificador =
+                            construirIdentificador(
+                                    actividad,
+                                    momento
+                            );
+
+                    if (
+                            !registro.yaFueProcesado(
+                                    identificador
+                            )
+                    ) {
+
+                        System.out.println(
+                                "  "
+                                        + dia
+                                        + " "
+                                        + fechaProxima
+                                        + " "
+                                        + horaRecordatorio
+                                        + " | "
+                                        + actividad.getTitulo()
+                        );
+
+                        encontrados = true;
+                    }
+                }
             }
+        }
+
+
+        if (!encontrados) {
+
+            System.out.println(
+                    "  Ninguno."
+            );
         }
     }
 
-    if (!encontrados) {
-
-        System.out.println(
-                "  Ninguno."
-        );
-    }
-}
 
     /*
      * ---------------------------------------------------------

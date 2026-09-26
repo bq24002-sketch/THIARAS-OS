@@ -26,6 +26,9 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import java.util.ArrayList;
 
 final class FormularioActividad {
 
@@ -133,14 +136,78 @@ final class FormularioActividad {
 
         hora.setPromptText("HH:mm");
 
-        Spinner<Integer> anticipacion =
+        VBox contenedorRecordatorios = new VBox(6);
+        Spinner<Integer> primerRecordatorio =
                 new Spinner<>(
                         new SpinnerValueFactory.IntegerSpinnerValueFactory(
-                                0,
-                                10080,
-                                15
-                        )
-                );
+                        0,
+                        10080,
+                        15
+                )
+        );
+
+        HBox filaRecordatorio = new HBox(6);
+
+        Button eliminarPrimerRecordatorio =
+                new Button("−");
+
+        filaRecordatorio.getChildren().addAll(
+                primerRecordatorio,
+                eliminarPrimerRecordatorio
+        );
+
+        contenedorRecordatorios.getChildren().add(
+                filaRecordatorio
+        );
+        eliminarPrimerRecordatorio.setOnAction(
+             evento ->
+                contenedorRecordatorios
+                        .getChildren()
+                        .remove(filaRecordatorio)
+        );
+        Button agregarRecordatorio =
+        new Button("+ Añadir aviso");
+
+        contenedorRecordatorios.getChildren().add(
+                agregarRecordatorio
+        );
+        agregarRecordatorio.setOnAction(evento -> {
+
+        Spinner<Integer> nuevoRecordatorio =
+            new Spinner<>(
+                    new SpinnerValueFactory.IntegerSpinnerValueFactory(
+                            0,
+                            10080,
+                            15
+                    )
+            );
+
+        HBox nuevaFila = new HBox(6);
+
+        Button eliminar =
+            new Button("−");
+
+        nuevaFila.getChildren().addAll(
+            nuevoRecordatorio,
+            eliminar
+        );
+
+        eliminar.setOnAction(
+            eventoEliminar ->
+                    contenedorRecordatorios
+                            .getChildren()
+                            .remove(nuevaFila)
+        );
+
+    int posicionBoton =
+            contenedorRecordatorios
+                    .getChildren()
+                    .size() - 1;
+
+    contenedorRecordatorios
+            .getChildren()
+            .add(posicionBoton, nuevaFila);
+        });
 
         CheckBox recurrente =
                 new CheckBox("Recurrente");
@@ -224,9 +291,6 @@ final class FormularioActividad {
                 );
             }
 
-            anticipacion.getValueFactory().setValue(
-                    actividadEditar.minutosAnticipacion()
-            );
 
             recurrente.setSelected(
                     actividadEditar.recurrente()
@@ -309,9 +373,9 @@ final class FormularioActividad {
         );
 
         formulario.addRow(
-                7,
-                new Label("Aviso previo (min)"),
-                anticipacion
+        7,
+        new Label("Avisos previos"),
+        contenedorRecordatorios
         );
 
         formulario.addRow(
@@ -480,7 +544,7 @@ final class FormularioActividad {
                                     horaValor,
                                     recurrente.isSelected(),
                                     diaValor,
-                                    anticipacion.getValue()
+                                    List.of(primerRecordatorio.getValue())
                             );
 
                     // =================================================
