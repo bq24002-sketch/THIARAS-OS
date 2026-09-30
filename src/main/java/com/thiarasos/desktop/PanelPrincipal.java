@@ -1,11 +1,13 @@
 package com.thiarasos.desktop;
 
+import javafx.geometry.Pos;
 import com.thiarasos.persistencia.ActividadInterfaz;
 import com.thiarasos.persistencia.EstadoAplicacion;
 import com.thiarasos.persistencia.NuevaActividad;
 import com.thiarasos.persistencia.NotificacionPendiente;
 import com.thiarasos.persistencia.TipoActividadBaseDatos;
 import com.thiarasos.servicio.ServicioActividad;
+import com.thiarasos.servicio.ServicioDiario;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -15,6 +17,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TableRow;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -28,41 +31,123 @@ import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import com.thiarasos.persistencia.ErrorPersistencia;
+import javafx.stage.Window;
+import javafx.scene.layout.StackPane;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 
 final class PanelPrincipal {
 
     private final ServicioActividad servicio;
-    private final ObservableList<ActividadInterfaz> actividades = FXCollections.observableArrayList();
-    private final ObservableList<NotificacionPendiente> notificaciones = FXCollections.observableArrayList();
-    private final Label hoy = new Label("--");
-    private final Label semana = new Label("--");
-    private final Label estadoConexion = new Label("Conectando...");
-    private final TableView<ActividadInterfaz> tablaActividades = new TableView<>(actividades);
-    private final TableView<NotificacionPendiente> tablaNotificaciones = new TableView<>(notificaciones);
+    private final ServicioDiario servicioDiario;
+    private BorderPane raizPrincipal;
+
+    private final GestorFondo gestorFondo =
+            new GestorFondo();
+
+    private final ObservableList<ActividadInterfaz> actividades =
+            FXCollections.observableArrayList();
+
+    private final ObservableList<NotificacionPendiente> notificaciones =
+            FXCollections.observableArrayList();
+
+    private final Label hoy =
+            new Label("--");
+
+    private final Label semana =
+            new Label("--");
+
+    private final Label estadoConexion =
+            new Label("Conectando...");
+
+    private final TableView<ActividadInterfaz> tablaActividades =
+            new TableView<>(actividades);
+
+    private final StackPane contenedorTablaActividades =
+            new StackPane();
+
+    private BarraAccionesFlotante barraAcciones;
+
+    private final TableView<NotificacionPendiente> tablaNotificaciones =
+            new TableView<>(notificaciones);
+
     private double posicionInicialX;
     private double posicionInicialY;
-    
-    PanelPrincipal(ServicioActividad servicio) {
+
+
+    PanelPrincipal(
+            ServicioActividad servicio,
+            ServicioDiario servicioDiario
+    ) {
         this.servicio = servicio;
+        this.servicioDiario = servicioDiario;
+    }
+
+
+    private void cambiarFondo() {
+
+        Window ventana =
+                tablaActividades
+                        .getScene()
+                        .getWindow();
+
+        gestorFondo.seleccionarYAplicar(
+                ventana,
+                (BorderPane) tablaActividades
+                        .getScene()
+                        .getRoot()
+        );
+    }
+    void restaurarFondo() {
+
+        if (raizPrincipal == null) {
+            return;
+        }
+
+        gestorFondo.restaurar(
+            raizPrincipal
+        );
     }
 
     BorderPane crear() {
-        BorderPane raiz = new BorderPane();
-        raiz.setTop(crearCabecera());
-        raiz.setCenter(crearContenido());
-        raiz.setBottom(crearPie());
+
+        BorderPane raiz =
+                new BorderPane();
+
+         this.raizPrincipal = raiz;
+
+        raiz.setTop(
+                crearCabecera()
+        );
+
+        raiz.setCenter(
+                crearContenido()
+        );
+
+        raiz.setBottom(
+                crearPie()
+        );
+
         return raiz;
     }
 
+
     void refrescar() {
-        ejecutarAsync(servicio::refrescar, this::aplicarEstado);
+
+        ejecutarAsync(
+                servicio::refrescar,
+                this::aplicarEstado
+        );
     }
 
+
     private HBox crearCabecera() {
-    return new CabeceraPrincipal(
-            this::abrirFormulario,
-            this::refrescar
-    ).crear();
+
+        return new CabeceraPrincipal(
+                this::abrirFormulario,
+                this::refrescar,
+                this::cambiarFondo
+        ).crear();
     }
 
     private VBox crearContenido() {
@@ -82,11 +167,54 @@ final class PanelPrincipal {
     }
 
     private VBox crearPanelActividades() {
-        Label titulo = new Label("Actividades");
-        titulo.getStyleClass().add("titulo-seccion");
+
+        Label titulo =
+                new Label("Actividades");
+
+        titulo.getStyleClass()
+            .add("titulo-seccion");
+
         configurarTablaActividades();
-        VBox panel = new VBox(10, titulo, tablaActividades);
-        VBox.setVgrow(tablaActividades, Priority.ALWAYS);
+
+        barraAcciones =
+            new BarraAccionesFlotante(
+                    id -> ejecutarAsync(
+                            () -> servicio.iniciarYRefrescar(id),
+                            this::aplicarEstado
+                    ),
+
+                    id -> ejecutarAsync(
+                            () -> servicio.completarYRefrescar(id),
+                            this::aplicarEstado
+                    ),
+
+                    id -> ejecutarAsync(
+                            () -> servicio.obtenerParaEdicion(id),
+                            this::abrirFormularioEdicion
+                    ),
+
+                    this::abrirDiario
+                );
+
+        contenedorTablaActividades
+                .getChildren()
+                .setAll(
+                        tablaActividades,
+                        barraAcciones
+                );
+
+        VBox panel =
+                new VBox(
+                        10,
+                        titulo,
+                        contenedorTablaActividades
+                );
+
+        VBox.setVgrow(
+                contenedorTablaActividades,
+                Priority.ALWAYS
+        );
+
         return panel;
     }
 
@@ -109,14 +237,14 @@ final class PanelPrincipal {
 
     private void configurarTablaActividades() {
         TableColumn<ActividadInterfaz, String> titulo = 
-        ColumnasTabla.crear ("Actividad", ActividadInterfaz::titulo, 0.35);
+            ColumnasTabla.crear ("Actividad", ActividadInterfaz::titulo, 0.35);
         
         
        TableColumn<ActividadInterfaz, String> tipo =
-        ColumnasTabla.crear ("Materia", ActividadInterfaz::materia, 0.18);
+            ColumnasTabla.crear ("Materia", ActividadInterfaz::materia, 0.18);
 
         TableColumn<ActividadInterfaz, String> fecha =
-        ColumnasTabla.crear ("Fecha", actividad -> {
+            ColumnasTabla.crear ("Fecha", actividad -> {
             if (actividad.fechaInicio() == null) {
                 return "Sin fecha";
             }
@@ -135,34 +263,53 @@ final class PanelPrincipal {
                 actividad.hora().toString(), 0.14);
         TableColumn<ActividadInterfaz, String> estado = 
         ColumnasTabla.crear ("Estado", ActividadInterfaz::estado, 0.14);
-        TableColumn<ActividadInterfaz, ActividadInterfaz> acciones = 
-        new TableColumn<>("Acciones");
-        acciones.setCellValueFactory(celda -> new javafx.beans.property.SimpleObjectProperty<>(celda.getValue()));
-        acciones.setCellFactory(columna ->
-        new CeldaAcciones(
-                id -> ejecutarAsync(
-                        () -> servicio.iniciarYRefrescar(id),
-                        this::aplicarEstado
-                ),
-                id -> ejecutarAsync(
-                        () -> servicio.completarYRefrescar(id),
-                        this::aplicarEstado
-                ),
-                id -> ejecutarAsync(
-                        () -> servicio.obtenerParaEdicion(id),
-                        this::abrirFormularioEdicion
-                )
-        )
-);
-        acciones.setPrefWidth(190);
-        
-
         tablaActividades.getColumns().setAll(
-        titulo, tipo, fecha, horario, estado, acciones);
+        titulo, tipo, fecha, horario, estado);
         tablaActividades.setPlaceholder(new Label("No hay actividades activas."));
         tablaActividades.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-    }
+        tablaActividades.setRowFactory(
+        tabla -> {
 
+            TableRow<ActividadInterfaz> fila =
+                    new TableRow<>();
+
+            fila.setOnMouseEntered(
+                    evento -> {
+
+                        if (fila.isEmpty()) {
+                            return;
+                        }
+
+                        ActividadInterfaz actividad =
+                                fila.getItem();
+
+                        if (actividad == null) {
+                            return;
+                        }
+
+                        mostrarAccionesSobreFila(
+                                fila,
+                                actividad
+                        );
+                    }
+            );
+
+            fila.setOnMouseExited(
+                    evento -> {
+
+                        if (barraAcciones == null) {
+                            return;
+                        }
+
+                        barraAcciones.ocultar();
+                    }
+            );
+
+            return fila;
+        }
+    );
+
+}
     private void configurarTablaNotificaciones() {
         TableColumn<NotificacionPendiente, String> tipo = 
         ColumnasTabla.crear ("Tipo", NotificacionPendiente::tipo, 0.18);
@@ -194,6 +341,14 @@ final class PanelPrincipal {
         estadoConexion.setText("Actualizado");
     }
 
+    private void abrirDiario(long actividadId) {
+
+        new VentanaDiario(
+            servicioDiario,
+            actividadId
+        ).mostrar();
+    }
+
     private void abrirFormulario() {
     ejecutarAsync(
             servicio::listarTipos,
@@ -223,8 +378,8 @@ private void abrirFormularioEdicion(
                                     this::aplicarEstado
                             )
             ).mostrar()
-    );
-}
+       );
+    }
     private void crearActividad(NuevaActividad actividad) {
         ejecutarAsync(() -> servicio.crearYRefrescar(actividad), this::aplicarEstado);
     }
@@ -267,5 +422,51 @@ private void abrirFormularioEdicion(
 
         alerta.show();
     }
+    private void mostrarAccionesSobreFila(
+        TableRow<ActividadInterfaz> fila,
+        ActividadInterfaz actividad
+) {
 
+    if (barraAcciones == null) {
+        return;
+    }
+
+    barraAcciones.mostrarPara(
+            actividad
+    );
+
+    javafx.geometry.Bounds limites =
+            fila.localToScene(
+                    fila.getBoundsInLocal()
+            );
+
+    javafx.geometry.Point2D posicion =
+            contenedorTablaActividades.sceneToLocal(
+                    limites.getMaxX(),
+                    limites.getMinY()
+            );
+
+    double ancho =
+            barraAcciones.prefWidth(-1);
+
+    double alto =
+            barraAcciones.prefHeight(-1);
+
+    double x = 
+    
+            posicion.getX()
+            - 899;
+
+    double y =
+            posicion.getY()
+            + (
+                fila.getHeight()
+                - alto
+            ) / 2;
+
+    barraAcciones.relocate(
+            x,
+            y
+    );
+  }
 }

@@ -331,21 +331,22 @@ public class GestorPendientes {
      * IDENTIFICADOR
      * ---------------------------------------------------------
      */
-    private String construirIdentificador(
-            Actividad actividad,
-            LocalDateTime momento
-    ) {
+    
+        private String construirIdentificador(
+                Actividad actividad,
+                LocalDateTime momento
+        ) {
 
-        return momento.toLocalDate()
-                + "|"
-                + actividad.getDia()
-                + "|"
-                + actividad.getHora()
-                + "|"
-                + actividad.getTitulo();
-    }
-
-
+                return momento.toLocalDate()
+                        + "|"
+                        + actividad.getId()
+                        + "|"
+                        + actividad.getDia()
+                        + "|"
+                        + momento.toLocalTime()
+                        + "|"
+                        + actividad.getTitulo();
+                }
     /*
      * ---------------------------------------------------------
      * FORMATEAR DURACIÓN

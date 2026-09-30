@@ -15,16 +15,19 @@ final class CabeceraPrincipal {
 
     private final Runnable alCrearActividad;
     private final Runnable alRefrescar;
+    private final Runnable alCambiarFondo;
 
     private double posicionInicialX;
     private double posicionInicialY;
 
     CabeceraPrincipal(
             Runnable alCrearActividad,
-            Runnable alRefrescar
+            Runnable alRefrescar,
+            Runnable alCambiarFondo
     ) {
         this.alCrearActividad = alCrearActividad;
         this.alRefrescar = alRefrescar;
+        this.alCambiarFondo = alCambiarFondo;
     }
 
     HBox crear() {
@@ -42,7 +45,7 @@ final class CabeceraPrincipal {
         Label marca = new Label("THIARAS OS");
         marca.getStyleClass().add("marca");
 
-        Label autor = new Label("Creado por Uber Barillas");
+        Label autor = new Label("Creado por Uber");
         autor.getStyleClass().add("autor");
 
         VBox identidadTexto = new VBox(
@@ -76,6 +79,10 @@ final class CabeceraPrincipal {
         nuevaActividad.setOnAction(
                 evento -> alCrearActividad.run()
         );
+        
+        Button fondo = new Button("Fondo");
+        fondo.getStyleClass().add("secundario");
+        fondo.setOnAction(evento -> alCambiarFondo.run());
 
         Button recargar =
                 new Button("Actualizar");
@@ -87,7 +94,7 @@ final class CabeceraPrincipal {
         );
 
         Button minimizar =
-                new Button("—");
+                new Button("▽");
 
         minimizar.getStyleClass().add("control-ventana");
 
@@ -102,7 +109,7 @@ final class CabeceraPrincipal {
         });
 
         Button maximizar =
-                new Button("□");
+                new Button("△");
 
         maximizar.getStyleClass().add("control-ventana");
 
@@ -119,7 +126,7 @@ final class CabeceraPrincipal {
         });
 
         Button cerrar =
-                new Button("×");
+                new Button("✕");
 
         cerrar.getStyleClass().add("control-cerrar");
 
@@ -152,6 +159,7 @@ final class CabeceraPrincipal {
                         seccion,
                         espacio,
                         nuevaActividad,
+                        fondo,
                         recargar,
                         controlesVentana
                 );

@@ -17,6 +17,7 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 
@@ -137,77 +138,37 @@ final class FormularioActividad {
         hora.setPromptText("HH:mm");
 
         VBox contenedorRecordatorios = new VBox(6);
-        Spinner<Integer> primerRecordatorio =
-                new Spinner<>(
-                        new SpinnerValueFactory.IntegerSpinnerValueFactory(
-                        0,
-                        10080,
-                        15
-                )
-        );
 
-        HBox filaRecordatorio = new HBox(6);
-
-        Button eliminarPrimerRecordatorio =
-                new Button("−");
-
-        filaRecordatorio.getChildren().addAll(
-                primerRecordatorio,
-                eliminarPrimerRecordatorio
-        );
-
-        contenedorRecordatorios.getChildren().add(
-                filaRecordatorio
-        );
-        eliminarPrimerRecordatorio.setOnAction(
-             evento ->
-                contenedorRecordatorios
-                        .getChildren()
-                        .remove(filaRecordatorio)
-        );
         Button agregarRecordatorio =
-        new Button("+ Añadir aviso");
+                new Button("+ Añadir aviso");
 
-        contenedorRecordatorios.getChildren().add(
-                agregarRecordatorio
-        );
         agregarRecordatorio.setOnAction(evento -> {
 
-        Spinner<Integer> nuevoRecordatorio =
-            new Spinner<>(
-                    new SpinnerValueFactory.IntegerSpinnerValueFactory(
-                            0,
-                            10080,
-                            15
-                    )
-            );
+                HBox nuevaFila =
+                        crearFilaRecordatorio(15);
 
-        HBox nuevaFila = new HBox(6);
+                int posicionBoton =
+                        contenedorRecordatorios
+                                .getChildren()
+                                .size() - 1;
 
-        Button eliminar =
-            new Button("−");
-
-        nuevaFila.getChildren().addAll(
-            nuevoRecordatorio,
-            eliminar
-        );
-
-        eliminar.setOnAction(
-            eventoEliminar ->
-                    contenedorRecordatorios
-                            .getChildren()
-                            .remove(nuevaFila)
-        );
-
-    int posicionBoton =
-            contenedorRecordatorios
-                    .getChildren()
-                    .size() - 1;
-
-    contenedorRecordatorios
-            .getChildren()
-            .add(posicionBoton, nuevaFila);
+        contenedorRecordatorios
+                                .getChildren()
+                                .add(posicionBoton, nuevaFila);
         });
+
+        // Primer recordatorio para una actividad nueva
+        HBox filaInicial =
+                crearFilaRecordatorio(15);
+
+        contenedorRecordatorios
+                .getChildren()
+                .add(filaInicial);
+
+        contenedorRecordatorios
+                .getChildren()
+                .add(agregarRecordatorio);
+
 
         CheckBox recurrente =
                 new CheckBox("Recurrente");
@@ -242,25 +203,50 @@ final class FormularioActividad {
         // CARGAR DATOS SI ESTAMOS EDITANDO
         // =====================================================
 
-        if (editando) {
+        
 
-            titulo.setText(
-                    actividadEditar.titulo() == null
+         // =====================================================
+        // CARGAR TODOS LOS RECORDATORIOS
+        // =====================================================
+
+if (editando) {
+
+    contenedorRecordatorios.getChildren().clear();
+
+        for (var recordatorio : actividadEditar.recordatorios()) {
+
+                HBox fila =
+                        crearFilaRecordatorio(
+                        recordatorio.minutosAnticipacion()
+                );
+
+                contenedorRecordatorios
+                        .getChildren()
+                        .add(fila);
+                }
+
+                contenedorRecordatorios
+                        .getChildren()
+                        .add(agregarRecordatorio);
+
+
+                titulo.setText(
+                        actividadEditar.titulo() == null
                             ? ""
                             : actividadEditar.titulo()
-            );
+               );
 
-            materia.setText(
+                materia.setText(
                     actividadEditar.materia() == null
                             ? ""
                             : actividadEditar.materia()
-            );
+                 );
 
-            contenido.setText(
+                contenido.setText(
                     actividadEditar.contenido() == null
                             ? ""
                             : actividadEditar.contenido()
-            );
+                );
 
             if (actividadEditar.duracionMinutos() != null) {
 
@@ -422,10 +408,23 @@ final class FormularioActividad {
                 contenido,
                 Priority.ALWAYS
         );
+        
+        ScrollPane desplazamiento = new ScrollPane(formulario);
 
-        dialogo.getDialogPane().setContent(
-                formulario
+        desplazamiento.setFitToWidth(true);
+        desplazamiento.setHbarPolicy(
+                ScrollPane.ScrollBarPolicy.NEVER
         );
+        desplazamiento.setVbarPolicy(
+                ScrollPane.ScrollBarPolicy.AS_NEEDED
+        );
+
+desplazamiento.setPrefViewportHeight(500);
+desplazamiento.setMaxHeight(500);
+
+dialogo.getDialogPane().setContent(
+        desplazamiento
+);
 
         Button botonOk =
                 (Button) dialogo.getDialogPane()
@@ -531,7 +530,26 @@ final class FormularioActividad {
                                         .getSelectedIndex()
                                         + 1;
                     }
+                
+                    List<Integer> minutosRecordatorios = new ArrayList<>();
 
+                    for (javafx.scene.Node nodo
+                         : contenedorRecordatorios.getChildren()) {
+
+                        if (nodo instanceof HBox fila) {
+
+                                 for (javafx.scene.Node elemento
+                                : fila.getChildren()) {
+
+                                        if (elemento instanceof Spinner<?> spinner) {
+
+                                        minutosRecordatorios.add(
+                                        (Integer) spinner.getValue()
+                                        );
+                                }
+                        }
+                }
+        }
                     NuevaActividad actividad =
                             new NuevaActividad(
                                     titulo.getText().trim(),
@@ -544,7 +562,7 @@ final class FormularioActividad {
                                     horaValor,
                                     recurrente.isSelected(),
                                     diaValor,
-                                    List.of(primerRecordatorio.getValue())
+                                    minutosRecordatorios
                             );
 
                     // =================================================
@@ -603,4 +621,35 @@ final class FormularioActividad {
 
         dialogo.showAndWait();
     }
+private HBox crearFilaRecordatorio(int minutosIniciales) {
+
+    Spinner<Integer> spinner =
+            new Spinner<>(
+                    new SpinnerValueFactory.IntegerSpinnerValueFactory(
+                            0,
+                            10080,
+                            minutosIniciales
+                    )
+            );
+
+    HBox fila = new HBox(6);
+
+    Button eliminar =
+            new Button("−");
+
+    fila.getChildren().addAll(
+            spinner,
+            eliminar
+    );
+
+    eliminar.setOnAction(
+            evento ->
+                    ((VBox) fila.getParent())
+                            .getChildren()
+                            .remove(fila)
+    );
+
+    return fila;
 }
+}
+

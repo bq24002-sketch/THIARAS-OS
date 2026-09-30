@@ -140,31 +140,3 @@ CREATE TABLE recordatorio (
 );
 
 
--- ============================================================
--- 5. EJECUCIONES
--- ============================================================
-
-CREATE TABLE ejecucion (
-
-    id                  BIGINT GENERATED ALWAYS AS IDENTITY,
-
-    actividad_id        BIGINT NOT NULL,
-
-    momento_programado  TIMESTAMP NOT NULL,
-
-    momento_ejecucion   TIMESTAMP,
-
-    tipo                VARCHAR(30) NOT NULL DEFAULT 'NORMAL',
-
-    estado              VARCHAR(30) NOT NULL DEFAULT 'PENDIENTE',
-
-    error               TEXT,
-
-    CONSTRAINT pk_ejecucion
-        PRIMARY KEY (id),
-
-    CONSTRAINT fk_ejecucion_actividad
-        FOREIGN KEY (actividad_id)
-        REFERENCES actividad (id)
-        ON DELETE CASCADE
-);
