@@ -1,7 +1,10 @@
 package com.thiarasos.agenda;
 
+import com.thiarasos.persistencia.Recordatorio;
+
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.List;
 
 public class Actividad {
 
@@ -21,7 +24,7 @@ public class Actividad {
 
     private final TipoActividad tipo;
 
-    private final int minutosAnticipacion;
+    private final List<Recordatorio> recordatorios;
 
 
     public Actividad(
@@ -33,7 +36,7 @@ public class Actividad {
             String contenido,
             String duracion,
             TipoActividad tipo,
-            int minutosAnticipacion
+            List<Recordatorio> recordatorios
     ) {
 
         this.id = id;
@@ -44,13 +47,35 @@ public class Actividad {
         this.contenido = contenido;
         this.duracion = duracion;
         this.tipo = tipo;
-        this.minutosAnticipacion = minutosAnticipacion;
+        this.recordatorios = recordatorios == null
+                ? List.of()
+                : List.copyOf(recordatorios);
     }
 
-    public Actividad(DayOfWeek dia, LocalTime hora, String materia, String titulo,
-                     String contenido, String duracion, TipoActividad tipo, int minutosAnticipacion) {
-        this(0, dia, hora, materia, titulo, contenido, duracion, tipo, minutosAnticipacion);
+
+    public Actividad(
+            DayOfWeek dia,
+            LocalTime hora,
+            String materia,
+            String titulo,
+            String contenido,
+            String duracion,
+            TipoActividad tipo,
+            List<Recordatorio> recordatorios
+    ) {
+        this(
+                0,
+                dia,
+                hora,
+                materia,
+                titulo,
+                contenido,
+                duracion,
+                tipo,
+                recordatorios
+        );
     }
+
 
     public long getId() {
         return id;
@@ -92,16 +117,23 @@ public class Actividad {
     }
 
 
-    public int getMinutosAnticipacion() {
-        return minutosAnticipacion;
+    public List<Recordatorio> getRecordatorios() {
+        return recordatorios;
     }
 
 
-    public LocalTime getHoraRecordatorio() {
+    public List<LocalTime> getHorasRecordatorio() {
 
-        return hora.minusMinutes(
-                minutosAnticipacion
-        );
+        if (hora == null) {
+            return List.of();
+        }
+
+        return recordatorios.stream()
+                .filter(Recordatorio::activo)
+                .map(recordatorio ->
+                        hora.minusMinutes(recordatorio.minutosAnticipacion())
+                )
+                .toList();
     }
 
 

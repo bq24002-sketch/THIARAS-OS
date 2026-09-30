@@ -36,13 +36,11 @@ public class MotorRecordatorios {
      */
     private final Set<String> recordatoriosProcesados;
 
-
     public MotorRecordatorios(
             Agenda agenda,
             ServicioCorreo servicioCorreo,
             RegistroEjecuciones registro
     ) {
-
         this(() -> agenda, servicioCorreo, registro);
     }
 
@@ -51,7 +49,6 @@ public class MotorRecordatorios {
             ServicioCorreo servicioCorreo,
             RegistroEjecuciones registro
     ) {
-
         this.proveedorAgenda = proveedorAgenda;
         this.servicioCorreo = servicioCorreo;
         this.registro = registro;
@@ -59,7 +56,6 @@ public class MotorRecordatorios {
         this.recordatoriosProcesados =
                 new HashSet<>();
     }
-
 
     /*
      * Revisa la agenda y determina qué recordatorios
@@ -78,135 +74,148 @@ public class MotorRecordatorios {
         DayOfWeek dia =
                 ahora.getDayOfWeek();
 
-
+        /*
+         * Recorremos las actividades del día.
+         */
         for (
                 Actividad actividad :
                 agenda.actividadesDelDia(dia)
         ) {
 
-            LocalTime horaRecordatorio =
-                    actividad.getHoraRecordatorio();
-
-
-            LocalDateTime momentoRecordatorio =
-                    LocalDateTime.of(
-                            fecha,
-                            horaRecordatorio
-                    );
-
-
-            String identificador =
-                    construirIdentificador(
-                            actividad,
-                            momentoRecordatorio
-                    );
-
-
             /*
-             * Primero comprobamos si este recordatorio
-             * ya fue procesado anteriormente.
+             * Una actividad puede tener varios recordatorios.
              *
-             * Esto consulta el archivo persistente.
-             */
-            if (
-                    registro.yaFueProcesado(
-                            identificador
-                    )
-            ) {
-
-                recordatoriosProcesados.add(
-                        identificador
-                );
-
-                continue;
-            }
-
-
-            /*
-             * También evitamos procesarlo dos veces
-             * durante la misma ejecución.
-             */
-            if (
-                    recordatoriosProcesados.contains(
-                            identificador
-                    )
-            ) {
-
-                continue;
-            }
-
-
-            /*
-             * -------------------------------------------------
-             * RECORDATORIO NORMAL
-             * -------------------------------------------------
+             * Ejemplo:
              *
-             * Si estamos exactamente en el minuto programado.
+             * actividad: 10:00
+             * recordatorio 1: 30 minutos antes → 09:30
+             * recordatorio 2: 10 minutos antes → 09:50
              */
-            if (
-                    ahora.getHour()
-                            == momentoRecordatorio.getHour()
-
-                    &&
-
-                    ahora.getMinute()
-                            == momentoRecordatorio.getMinute()
+            for (
+                    LocalTime horaRecordatorio :
+                    actividad.getHorasRecordatorio()
             ) {
 
-                enviarNormal(
-                        actividad,
-                        momentoRecordatorio,
-                        identificador
-                );
-
-                continue;
-            }
-
-
-            /*
-             * -------------------------------------------------
-             * RECORDATORIO ATRASADO
-             * -------------------------------------------------
-             *
-             * Si la hora programada ya pasó.
-             */
-            if (
-                    ahora.isAfter(
-                            momentoRecordatorio
-                    )
-            ) {
-
-                Duration atraso =
-                        Duration.between(
-                                momentoRecordatorio,
-                                ahora
+                LocalDateTime momentoRecordatorio =
+                        LocalDateTime.of(
+                                fecha,
+                                horaRecordatorio
                         );
 
-
-                long horasAtraso =
-                        atraso.toHours();
-
+                /*
+                 * El identificador debe distinguir cada
+                 * recordatorio individual.
+                 *
+                 * Por eso usamos la hora concreta del
+                 * recordatorio y no solamente la hora
+                 * de inicio de la actividad.
+                 */
+                String identificador =
+                        construirIdentificador(
+                                actividad,
+                                momentoRecordatorio
+                        );
 
                 /*
-                 * Solamente recuperamos recordatorios
-                 * dentro de la ventana permitida.
+                 * Primero comprobamos si este recordatorio
+                 * ya fue procesado anteriormente.
+                 *
+                 * Esto consulta el archivo persistente.
                  */
                 if (
-                        horasAtraso
-                                <= HORAS_MAXIMAS_RECUPERACION
+                        registro.yaFueProcesado(
+                                identificador
+                        )
                 ) {
 
-                    enviarAtrasado(
+                    recordatoriosProcesados.add(
+                            identificador
+                    );
+
+                    continue;
+                }
+
+                /*
+                 * También evitamos procesarlo dos veces
+                 * durante la misma ejecución.
+                 */
+                if (
+                        recordatoriosProcesados.contains(
+                                identificador
+                        )
+                ) {
+
+                    continue;
+                }
+
+                /*
+                 * -------------------------------------------------
+                 * RECORDATORIO NORMAL
+                 * -------------------------------------------------
+                 *
+                 * Si estamos exactamente en el minuto programado.
+                 */
+                if (
+                        ahora.getHour()
+                                == momentoRecordatorio.getHour()
+
+                        &&
+
+                        ahora.getMinute()
+                                == momentoRecordatorio.getMinute()
+                ) {
+
+                    enviarNormal(
                             actividad,
                             momentoRecordatorio,
-                            identificador,
-                            atraso
+                            identificador
                     );
+
+                    continue;
+                }
+
+                /*
+                 * -------------------------------------------------
+                 * RECORDATORIO ATRASADO
+                 * -------------------------------------------------
+                 *
+                 * Si la hora programada ya pasó.
+                 */
+                if (
+                        ahora.isAfter(
+                                momentoRecordatorio
+                        )
+                ) {
+
+                    Duration atraso =
+                            Duration.between(
+                                    momentoRecordatorio,
+                                    ahora
+                            );
+
+                    long horasAtraso =
+                            atraso.toHours();
+
+                    /*
+                     * Solamente recuperamos recordatorios
+                     * dentro de la ventana permitida.
+                     */
+                    if (
+                            horasAtraso
+                                    <= HORAS_MAXIMAS_RECUPERACION
+                    ) {
+
+                        enviarAtrasado(
+                                actividad,
+                                momentoRecordatorio,
+                                identificador,
+                                atraso
+                        );
+                    }
                 }
             }
         }
     }
-
 
     /*
      * ---------------------------------------------------------
@@ -234,7 +243,6 @@ public class MotorRecordatorios {
                         + momentoRecordatorio
         );
 
-
         try {
 
             boolean enviado =
@@ -244,7 +252,6 @@ public class MotorRecordatorios {
                             actividad.getContenido(),
                             actividad.getDuracion()
                     );
-
 
             if (enviado) {
 
@@ -290,7 +297,6 @@ public class MotorRecordatorios {
         }
     }
 
-
     /*
      * ---------------------------------------------------------
      * ENVÍO DE RECORDATORIO ATRASADO
@@ -327,7 +333,6 @@ public class MotorRecordatorios {
                 "  → Reenviando..."
         );
 
-
         try {
 
             boolean enviado =
@@ -339,7 +344,6 @@ public class MotorRecordatorios {
                             momentoRecordatorio,
                             atraso
                     );
-
 
             if (enviado) {
 
@@ -385,7 +389,6 @@ public class MotorRecordatorios {
         }
     }
 
-
     /*
      * Convierte una duración a un texto legible.
      *
@@ -407,7 +410,6 @@ public class MotorRecordatorios {
         long minutosRestantes =
                 minutos % 60;
 
-
         if (horas > 0) {
 
             return horas
@@ -420,10 +422,9 @@ public class MotorRecordatorios {
                 + " minutos";
     }
 
-
     /*
      * Genera un identificador único para cada
-     * ejecución de cada actividad.
+     * ejecución de cada recordatorio.
      */
     private String construirIdentificador(
             Actividad actividad,
@@ -436,7 +437,7 @@ public class MotorRecordatorios {
                 + "|"
                 + actividad.getDia()
                 + "|"
-                + actividad.getHora()
+                + momentoRecordatorio.toLocalTime()
                 + "|"
                 + actividad.getTitulo();
     }

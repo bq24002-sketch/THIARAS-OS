@@ -21,13 +21,9 @@
     </description>
 
     <properties>
-
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <javafx.version>23.0.2</javafx.version>
-
+    <javafx.version>23.0.2</javafx.version>
+    <maven.compiler.release>21</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
@@ -62,28 +58,45 @@
     </dependencies>
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.8</version>
-                <configuration>
-                    <mainClass>com.thiarasos.desktop.AplicacionThiaras</mainClass>
-                </configuration>
-            </plugin>
-        </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-            <resource>
-                <directory>data/database/queries</directory>
-                <targetPath>sql</targetPath>
-                <includes>
-                    <include>*.sql</include>
-                </includes>
-            </resource>
-        </resources>
-    </build>
+       <plugins>
 
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.15.0</version>
+            <configuration>
+                <release>21</release>
+                <compilerArgs>
+                    <arg>-Xlint:unchecked</arg>
+                </compilerArgs>
+            </configuration>
+        </plugin>
+
+        <plugin>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-maven-plugin</artifactId>
+            <version>0.0.8</version>
+            <configuration>
+                <mainClass>
+                    com.thiarasos.desktop.AplicacionThiaras
+                </mainClass>
+            </configuration>
+        </plugin>
+
+    </plugins>
+
+    <resources>
+        <resource>
+            <directory>src/main/resources</directory>
+        </resource>
+
+        <resource>
+            <directory>data/database/queries</directory>
+            <targetPath>sql</targetPath>
+            <includes>
+                <include>*.sql</include>
+            </includes>
+        </resource>
+      </resources>
+   </build>
 </project>

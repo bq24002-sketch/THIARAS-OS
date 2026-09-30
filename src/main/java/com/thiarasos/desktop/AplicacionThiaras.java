@@ -1,26 +1,46 @@
 package com.thiarasos.desktop;
 
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
 import com.thiarasos.config.Configuracion;
+import com.thiarasos.servicio.ServicioActividad;
+import com.thiarasos.servicio.ServicioDiario;
 import com.thiarasos.servicio.ServiciosPersistencia;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.scene.layout.BorderPane;
 
 public final class AplicacionThiaras extends Application {
 
     @Override
     public void start(Stage escenario) {
 
-        PanelPrincipal panel = new PanelPrincipal(
+        Configuracion configuracion =
+                new Configuracion();
+
+        ServicioActividad servicio =
                 ServiciosPersistencia.crearServicioActividad(
-                        new Configuracion()
-                )
+                        configuracion
+                );
+
+        ServicioDiario servicioDiario =
+                ServiciosPersistencia.crearServicioDiario(
+                        configuracion
+                );
+
+        PanelPrincipal panel = new PanelPrincipal(
+                servicio,
+                servicioDiario
         );
 
+        BorderPane raiz =
+        panel.crear();
+
         Scene escena = new Scene(
-                panel.crear(),
+                raiz,
                 1180,
                 760
         );
@@ -31,6 +51,7 @@ public final class AplicacionThiaras extends Application {
                         .toExternalForm()
         );
 
+panel.restaurarFondo();
         /*
          * Eliminamos la decoración nativa de Windows.
          * La barra superior de THIARAS será nuestra propia interfaz.
@@ -45,9 +66,11 @@ public final class AplicacionThiaras extends Application {
         escenario.setScene(escena);
 
         escenario.show();
+
         escenario.setOnShown(evento -> {
-        escenario.setMaximized(true);
+            escenario.setMaximized(true);
         });
+
         panel.refrescar();
     }
 

@@ -1,5 +1,6 @@
 package com.thiarasos.persistencia;
 
+import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -14,6 +15,6 @@ public record NuevaActividad(
         LocalTime hora,
         boolean recurrente,
         int diaSemana,
-        int minutosAnticipacion
+        List<Integer> minutosAnticipacion
 ) {
 }

@@ -2,6 +2,7 @@ package com.thiarasos.persistencia;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 public record ActividadEditable(
         long id,
@@ -15,6 +16,6 @@ public record ActividadEditable(
         LocalTime hora,
         boolean recurrente,
         int diaSemana,
-        int minutosAnticipacion
+        List<Recordatorio> recordatorios
 ) {
 }

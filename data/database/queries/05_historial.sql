@@ -1,21 +1,20 @@
 -- ============================================================
 -- THIARAS OS
--- CONSULTA - HISTORIAL DE EJECUCIONES
+-- CONSULTA - HISTORIAL DE CUMPLIMIENTO DE ACTIVIDADES
 -- ============================================================
 
 SELECT
-    e.id,
+    ca.id,
+    ca.actividad_id,
     a.titulo,
-    e.momento_programado,
-    e.momento_ejecucion,
-    e.tipo,
-    e.estado,
-    e.error
-
-FROM ejecucion e
-
+    ca.fecha,
+    ca.momento_inicio,
+    ca.momento_fin,
+    ca.minutos_realizados,
+    ca.estado,
+    ca.observaciones
+FROM cumplimiento_actividad ca
 JOIN actividad a
-    ON a.id = e.actividad_id
-
+    ON a.id = ca.actividad_id
 ORDER BY
-    e.momento_ejecucion DESC;
+    ca.momento_inicio DESC;

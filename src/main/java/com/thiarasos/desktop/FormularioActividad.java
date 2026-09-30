@@ -17,6 +17,7 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 
@@ -26,12 +27,15 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import java.util.ArrayList;
 
 final class FormularioActividad {
 
     private final List<TipoActividadBaseDatos> tipos;
-    private final Predicate<NuevaActividad> existeConflictoHorario;
+    private final java.util.function.BiPredicate<NuevaActividad, Long>
+        existeConflictoHorario;
 
     private final Consumer<NuevaActividad> alGuardar;
     private final BiConsumer<Long, NuevaActividad> alModificar;
@@ -42,11 +46,14 @@ final class FormularioActividad {
     // CONSTRUCTOR PARA NUEVA ACTIVIDAD
     // =========================================================
 
+
     FormularioActividad(
-            List<TipoActividadBaseDatos> tipos,
-            Predicate<NuevaActividad> existeConflictoHorario,
-            Consumer<NuevaActividad> alGuardar
-    ) {
+        List<TipoActividadBaseDatos> tipos,
+        java.util.function.BiPredicate<NuevaActividad, Long>
+                existeConflictoHorario,
+        Consumer<NuevaActividad> alGuardar
+    )
+    {
         this.tipos = tipos;
         this.existeConflictoHorario = existeConflictoHorario;
         this.alGuardar = alGuardar;
@@ -59,11 +66,13 @@ final class FormularioActividad {
     // =========================================================
 
     FormularioActividad(
-            List<TipoActividadBaseDatos> tipos,
-            Predicate<NuevaActividad> existeConflictoHorario,
-            ActividadEditable actividadEditar,
-            BiConsumer<Long, NuevaActividad> alModificar
-    ) {
+        List<TipoActividadBaseDatos> tipos,
+        java.util.function.BiPredicate<NuevaActividad, Long>
+                existeConflictoHorario,
+        ActividadEditable actividadEditar,
+        BiConsumer<Long, NuevaActividad> alModificar
+     ) 
+     {
         this.tipos = tipos;
         this.existeConflictoHorario = existeConflictoHorario;
         this.alGuardar = null;
@@ -128,14 +137,38 @@ final class FormularioActividad {
 
         hora.setPromptText("HH:mm");
 
-        Spinner<Integer> anticipacion =
-                new Spinner<>(
-                        new SpinnerValueFactory.IntegerSpinnerValueFactory(
-                                0,
-                                10080,
-                                15
-                        )
-                );
+        VBox contenedorRecordatorios = new VBox(6);
+
+        Button agregarRecordatorio =
+                new Button("+ Añadir aviso");
+
+        agregarRecordatorio.setOnAction(evento -> {
+
+                HBox nuevaFila =
+                        crearFilaRecordatorio(15);
+
+                int posicionBoton =
+                        contenedorRecordatorios
+                                .getChildren()
+                                .size() - 1;
+
+        contenedorRecordatorios
+                                .getChildren()
+                                .add(posicionBoton, nuevaFila);
+        });
+
+        // Primer recordatorio para una actividad nueva
+        HBox filaInicial =
+                crearFilaRecordatorio(15);
+
+        contenedorRecordatorios
+                .getChildren()
+                .add(filaInicial);
+
+        contenedorRecordatorios
+                .getChildren()
+                .add(agregarRecordatorio);
+
 
         CheckBox recurrente =
                 new CheckBox("Recurrente");
@@ -170,25 +203,50 @@ final class FormularioActividad {
         // CARGAR DATOS SI ESTAMOS EDITANDO
         // =====================================================
 
-        if (editando) {
+        
 
-            titulo.setText(
-                    actividadEditar.titulo() == null
+         // =====================================================
+        // CARGAR TODOS LOS RECORDATORIOS
+        // =====================================================
+
+if (editando) {
+
+    contenedorRecordatorios.getChildren().clear();
+
+        for (var recordatorio : actividadEditar.recordatorios()) {
+
+                HBox fila =
+                        crearFilaRecordatorio(
+                        recordatorio.minutosAnticipacion()
+                );
+
+                contenedorRecordatorios
+                        .getChildren()
+                        .add(fila);
+                }
+
+                contenedorRecordatorios
+                        .getChildren()
+                        .add(agregarRecordatorio);
+
+
+                titulo.setText(
+                        actividadEditar.titulo() == null
                             ? ""
                             : actividadEditar.titulo()
-            );
+               );
 
-            materia.setText(
+                materia.setText(
                     actividadEditar.materia() == null
                             ? ""
                             : actividadEditar.materia()
-            );
+                 );
 
-            contenido.setText(
+                contenido.setText(
                     actividadEditar.contenido() == null
                             ? ""
                             : actividadEditar.contenido()
-            );
+                );
 
             if (actividadEditar.duracionMinutos() != null) {
 
@@ -219,9 +277,6 @@ final class FormularioActividad {
                 );
             }
 
-            anticipacion.getValueFactory().setValue(
-                    actividadEditar.minutosAnticipacion()
-            );
 
             recurrente.setSelected(
                     actividadEditar.recurrente()
@@ -304,9 +359,9 @@ final class FormularioActividad {
         );
 
         formulario.addRow(
-                7,
-                new Label("Aviso previo (min)"),
-                anticipacion
+        7,
+        new Label("Avisos previos"),
+        contenedorRecordatorios
         );
 
         formulario.addRow(
@@ -353,10 +408,23 @@ final class FormularioActividad {
                 contenido,
                 Priority.ALWAYS
         );
+        
+        ScrollPane desplazamiento = new ScrollPane(formulario);
 
-        dialogo.getDialogPane().setContent(
-                formulario
+        desplazamiento.setFitToWidth(true);
+        desplazamiento.setHbarPolicy(
+                ScrollPane.ScrollBarPolicy.NEVER
         );
+        desplazamiento.setVbarPolicy(
+                ScrollPane.ScrollBarPolicy.AS_NEEDED
+        );
+
+desplazamiento.setPrefViewportHeight(500);
+desplazamiento.setMaxHeight(500);
+
+dialogo.getDialogPane().setContent(
+        desplazamiento
+);
 
         Button botonOk =
                 (Button) dialogo.getDialogPane()
@@ -462,7 +530,26 @@ final class FormularioActividad {
                                         .getSelectedIndex()
                                         + 1;
                     }
+                
+                    List<Integer> minutosRecordatorios = new ArrayList<>();
 
+                    for (javafx.scene.Node nodo
+                         : contenedorRecordatorios.getChildren()) {
+
+                        if (nodo instanceof HBox fila) {
+
+                                 for (javafx.scene.Node elemento
+                                : fila.getChildren()) {
+
+                                        if (elemento instanceof Spinner<?> spinner) {
+
+                                        minutosRecordatorios.add(
+                                        (Integer) spinner.getValue()
+                                        );
+                                }
+                        }
+                }
+        }
                     NuevaActividad actividad =
                             new NuevaActividad(
                                     titulo.getText().trim(),
@@ -475,7 +562,7 @@ final class FormularioActividad {
                                     horaValor,
                                     recurrente.isSelected(),
                                     diaValor,
-                                    anticipacion.getValue()
+                                    minutosRecordatorios
                             );
 
                     // =================================================
@@ -485,9 +572,12 @@ final class FormularioActividad {
                     try {
 
                         boolean conflicto =
-                                existeConflictoHorario.test(
-                                        actividad
-                                );
+                        existeConflictoHorario.test(
+                                      actividad,
+                                       editando
+                                ? actividadEditar.id()
+                                : null
+                                       );
 
                         if (conflicto) {
 
@@ -531,4 +621,35 @@ final class FormularioActividad {
 
         dialogo.showAndWait();
     }
+private HBox crearFilaRecordatorio(int minutosIniciales) {
+
+    Spinner<Integer> spinner =
+            new Spinner<>(
+                    new SpinnerValueFactory.IntegerSpinnerValueFactory(
+                            0,
+                            10080,
+                            minutosIniciales
+                    )
+            );
+
+    HBox fila = new HBox(6);
+
+    Button eliminar =
+            new Button("−");
+
+    fila.getChildren().addAll(
+            spinner,
+            eliminar
+    );
+
+    eliminar.setOnAction(
+            evento ->
+                    ((VBox) fila.getParent())
+                            .getChildren()
+                            .remove(fila)
+    );
+
+    return fila;
 }
+}
+
