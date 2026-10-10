@@ -16,6 +16,7 @@ final class CabeceraPrincipal {
     private final Runnable alCrearActividad;
     private final Runnable alRefrescar;
     private final Runnable alCambiarFondo;
+    private final Runnable alAbrirSemana;
 
     private double posicionInicialX;
     private double posicionInicialY;
@@ -23,11 +24,13 @@ final class CabeceraPrincipal {
     CabeceraPrincipal(
             Runnable alCrearActividad,
             Runnable alRefrescar,
-            Runnable alCambiarFondo
+            Runnable alCambiarFondo,
+            Runnable alAbrirSemana
     ) {
         this.alCrearActividad = alCrearActividad;
         this.alRefrescar = alRefrescar;
         this.alCambiarFondo = alCambiarFondo;
+        this.alAbrirSemana = alAbrirSemana;
     }
 
     HBox crear() {
@@ -80,6 +83,10 @@ final class CabeceraPrincipal {
                 evento -> alCrearActividad.run()
         );
         
+        Button semana = new Button("Semana");
+        semana.getStyleClass().add("secundario");
+        semana.setOnAction(evento -> alAbrirSemana.run());
+
         Button fondo = new Button("Fondo");
         fondo.getStyleClass().add("secundario");
         fondo.setOnAction(evento -> alCambiarFondo.run());
@@ -159,6 +166,7 @@ final class CabeceraPrincipal {
                         seccion,
                         espacio,
                         nuevaActividad,
+                        semana,
                         fondo,
                         recargar,
                         controlesVentana

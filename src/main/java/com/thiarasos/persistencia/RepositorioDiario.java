@@ -10,8 +10,19 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class RepositorioDiario {
 
+    private Integer obtenerEntero(ResultSet resultado, String columna) throws SQLException {
+    int valor = resultado.getInt(columna);
+
+    if (resultado.wasNull()) {
+        return null;
+    }
+
+    return valor;
+}
+    
     private final ProveedorConexion proveedorConexion;
 
     private static final String INSERTAR = """
@@ -197,4 +208,57 @@ public class RepositorioDiario {
                 )
         );
     }
+
+
+    public List<CumplimientoDiario> listarCumplimientos(long actividadId) {
+    String sql = """
+        SELECT
+            id,
+            fecha,
+            momento_inicio,
+            momento_fin,
+            minutos_realizados,
+            estado
+        FROM cumplimiento_actividad
+        WHERE actividad_id = ?
+        ORDER BY COALESCE(momento_inicio, fecha::timestamp) DESC
+        """;
+
+    try (var conexion = proveedorConexion.abrir();
+         PreparedStatement sentencia = conexion.prepareStatement(sql)) {
+
+        sentencia.setLong(1, actividadId);
+
+        try (ResultSet resultado = sentencia.executeQuery()) {
+            List<CumplimientoDiario> cumplimientos = new ArrayList<>();
+
+            while (resultado.next()) {
+                cumplimientos.add(
+                    new CumplimientoDiario(
+                        resultado.getLong("id"),
+                        resultado.getObject("fecha", LocalDate.class),
+                        resultado.getObject(
+                            "momento_inicio",
+                            LocalDateTime.class
+                        ),
+                        resultado.getObject(
+                            "momento_fin",
+                            LocalDateTime.class
+                        ),
+                        obtenerEntero(resultado, "minutos_realizados"),
+                        resultado.getString("estado")
+                    )
+                );
+            }
+
+            return List.copyOf(cumplimientos);
+        }
+
+    } catch (SQLException e) {
+        throw new ErrorPersistencia(
+            "No se pudieron cargar las realizaciones de la actividad",
+            e
+        );
+    }
+  }
 }

@@ -34,6 +34,3 @@ CREATE INDEX idx_recordatorio_actividad
 ON recordatorio (actividad_id);
 
 
-CREATE UNIQUE INDEX uq_cumplimiento_actividad_en_progreso
-ON cumplimiento_actividad (actividad_id)
-WHERE estado = 'EN_PROGRESO';

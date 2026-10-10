@@ -8,6 +8,7 @@ import com.thiarasos.persistencia.RepositorioDashboard;
 import com.thiarasos.persistencia.RepositorioNotificacion;
 import com.thiarasos.persistencia.NuevaActividad;
 import com.thiarasos.persistencia.TipoActividadBaseDatos;
+import java.time.LocalDate;
 
 import java.util.List;
 
@@ -27,8 +28,17 @@ public final class ServicioActividad {
         this.notificaciones = notificaciones;
     }
 
+    
     public EstadoAplicacion iniciarYRefrescar(long actividadId) {
         actividades.iniciar(actividadId);
+        return refrescar();
+    }
+
+    public EstadoAplicacion iniciarYRefrescar(
+        long actividadId,
+        LocalDate fecha
+    ) {
+        actividades.iniciar(actividadId, fecha);
         return refrescar();
     }
 
@@ -44,6 +54,10 @@ public final class ServicioActividad {
 
     public EstadoActividad obtenerEstado(long actividadId) {
         return actividades.obtenerEstado(actividadId);
+    }
+
+    public List<com.thiarasos.persistencia.ActividadSemanal> listarSemana() {
+        return actividades.listarSemana();
     }
 
     public List<TipoActividadBaseDatos> listarTipos() {

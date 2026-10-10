@@ -37,8 +37,12 @@
 \i 'ddl/12_crear_funcion_marcar_notificacion_leida.sql'
 \i 'ddl/13_crear_funcion_estado_actividad.sql'
 \i 'ddl/14_crear_funcion_existe_conflicto.sql'
-\echo 'Creando diario...'
+
+\echo '9. Creando diario...'
 \i 'ddl/15_crear_diario.sql'
+
+\echo '10. Creando inicio de actividad por fecha...'
+\i 'ddl/16_crear_funcion_iniciar_actividad_en_fecha.sql'
 
 \echo '============================================'
 \echo ' INSTALACION COMPLETADA'

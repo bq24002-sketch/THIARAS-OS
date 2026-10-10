@@ -4,20 +4,35 @@
    ========================================================== */
 
 .root {
-    -fx-font-family: "Roboto", "Segoe UI", sans-serif;
-    -fx-background-color: #10081C;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-background-color: #171020;
     -fx-text-fill: #FFFFFF;
 }
-
 /* BARRA SUPERIOR */
 .tool-bar {
-    -fx-background-color: linear-gradient(to right, #21102F, #351457);
+    -fx-background-color:
+        linear-gradient(
+            to right,
+            #352047,
+            #5B3A78
+        );
+
     -fx-padding: 10 24 10 24;
     -fx-spacing: 14;
-    -fx-border-color: #43235C;
+
+    -fx-border-color: #76529A;
     -fx-border-width: 0 0 1 0;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 14, 0.18, 0, 3);
-}
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(0,0,0,0.35),
+            14,
+            0.18,
+            0,
+            3
+        );
+} 
 
 .tool-bar .button {
     -fx-background-color: #2A173A;
@@ -59,24 +74,35 @@
 .titulo-seccion {
     -fx-font-size: 18px;
     -fx-font-weight: 700;
-    -fx-text-fill: #C084FC;
+    -fx-text-fill: #D8B4FE;
     -fx-padding: 6 0 8 0;
 }
-
 /* MÉTRICAS */
 .metrica {
-    -fx-background-color: #1A0F27;
-    -fx-background-radius: 12;
-    -fx-border-color: #352044;
+    -fx-background-color: #261936;
+
+    -fx-background-radius: 14;
+
+    -fx-border-color: #4D3563;
     -fx-border-width: 1;
-    -fx-border-radius: 12;
+    -fx-border-radius: 14;
+
     -fx-padding: 14 20 14 20;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.38), 14, 0.16, 0, 4);
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(0,0,0,0.28),
+            14,
+            0.16,
+            0,
+            4
+        );
 }
 
 .metrica:hover {
-    -fx-background-color: #20122F;
-    -fx-border-color: #5B2A78;
+    -fx-background-color: #302044;
+    -fx-border-color: #76509A;
 }
 
 .metrica .label:first-child {
@@ -93,42 +119,47 @@
 
 /* BOTONES */
 .button {
-    -fx-font-family: "Roboto", "Segoe UI", sans-serif;
+    -fx-font-family: "Segoe UI", sans-serif;
     -fx-font-size: 13px;
     -fx-font-weight: 600;
-    -fx-background-color: #271438;
-    -fx-text-fill: #F8F5FB;
-    -fx-background-radius: 8;
-    -fx-border-radius: 8;
+
+    -fx-background-color: #39234D;
+    -fx-text-fill: #F8F3FF;
+
+    -fx-background-radius: 9;
+    -fx-border-radius: 9;
+
     -fx-padding: 9 17 9 17;
+
     -fx-cursor: hand;
-    -fx-border-color: #45265B;
+
+    -fx-border-color: #62447A;
     -fx-border-width: 1;
 }
 
 .button:hover {
-    -fx-background-color: #3B1B58;
-    -fx-border-color: #8B5CF6;
+    -fx-background-color: #56316F;
+    -fx-border-color: #B57AE6;
 }
 
 .button:pressed {
-    -fx-background-color: #6D28D9;
+    -fx-background-color: #7C3AED;
 }
 
 .primario {
-    -fx-background-color: #6D28D9;
+    -fx-background-color: #8B5CF6;
     -fx-text-fill: #FFFFFF;
     -fx-font-weight: 700;
-    -fx-border-color: #8B5CF6;
+    -fx-border-color: #B794F4;
 }
 
 .primario:hover {
-    -fx-background-color: #7C3AED;
-    -fx-border-color: #C084FC;
+    -fx-background-color: #A06AF8;
+    -fx-border-color: #D8B4FE;
 }
 
 .primario:pressed {
-    -fx-background-color: #5B21B6;
+    -fx-background-color: #7C3AED;
 }
 
 .secundario {
@@ -148,20 +179,38 @@
 
 /* TABLA */
 .table-view {
-    -fx-background-color: #150C21;
-    -fx-background-radius: 12;
-    -fx-border-color: #352044;
+    -fx-background-color: #1D1328;
+    -fx-background-radius: 14;
+
+    -fx-border-color: #49335A;
     -fx-border-width: 1;
-    -fx-border-radius: 12;
+    -fx-border-radius: 14;
+
     -fx-padding: 2;
-    -fx-control-inner-background: #150C21;
-    -fx-control-inner-background-alt: #190E27;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.40), 14, 0.15, 0, 3);
+
+    -fx-control-inner-background: #1D1328;
+    -fx-control-inner-background-alt: #241731;
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(0,0,0,0.32),
+            14,
+            0.15,
+            0,
+            3
+        );
 }
 
 .table-view .column-header-background {
-    -fx-background-color: linear-gradient(to right, #2B123F, #3A1855);
-    -fx-background-radius: 10 10 0 0;
+    -fx-background-color:
+        linear-gradient(
+            to right,
+            #3B2450,
+            #513069
+        );
+
+    -fx-background-radius: 12 12 0 0;
 }
 
 .table-view .column-header {
@@ -264,6 +313,12 @@
     -fx-border-radius: 12;
     -fx-padding: 16;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 10, 0.12, 0, 3);
+}
+.accion-semanal {
+    -fx-padding: 6 8 6 8;
+    -fx-min-width: 38px;
+    -fx-pref-width: 38px;
+    -fx-max-width: 38px;
 }
 
 /* FORMULARIOS */
@@ -368,7 +423,7 @@
 }
 
 .date-picker-popup .day-cell {
-    -fx-background-color: #180D25;
+    -fx-background-color: #501198;
     -fx-text-fill: #F1EBF6;
 }
 
@@ -488,4 +543,255 @@
 .control-ventana:pressed,
 .control-cerrar:pressed {
     -fx-background-color: rgba(0, 0, 0, 0.30);
+}
+
+/* ==========================================================
+   VENTANA SEMANAL — TEMA TURQUESA + BLANCO
+   ========================================================== */
+
+.ventana-semanal {
+    -fx-background-color: #f4ffff;
+}
+
+
+/* ==========================================================
+   ÁREA DE DESPLAZAMIENTO
+   ========================================================== */
+
+.scroll-semanal {
+    -fx-background-color: #e3f8f8;
+    -fx-background-radius: 14;
+    -fx-border-color: #b8e5e5;
+    -fx-border-width: 1;
+    -fx-border-radius: 14;
+}
+
+.scroll-semanal .viewport {
+    -fx-background-color: #e3f8f8;
+}
+
+.scroll-semanal .content {
+    -fx-background-color: #e3f8f8;
+}
+
+
+/* ==========================================================
+   COLUMNAS DE LOS DÍAS
+   ========================================================== */
+
+.dia-semanal {
+    -fx-background-color: #38b8b5;
+    -fx-background-radius: 14;
+
+    -fx-border-color: #239a98;
+    -fx-border-width: 1;
+    -fx-border-radius: 14;
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(0, 70, 70, 0.20),
+            10,
+            0.15,
+            0,
+            3
+        );
+}
+
+
+/* ==========================================================
+   TÍTULO DEL DÍA
+   ========================================================== */
+
+.titulo-dia-semanal {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 20px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #ffffff;
+}
+
+
+/* ==========================================================
+   FECHA
+   ========================================================== */
+
+.fecha-dia-semanal {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #eaffff;
+}
+
+
+/* ==========================================================
+   TARJETAS DE ACTIVIDADES
+   ========================================================== */
+
+/*
+ * La tarjeta actualmente usa la clase "metrica".
+ * Por eso la regla está limitada a la ventana semanal.
+ */
+
+.ventana-semanal .metrica {
+    -fx-background-color: #ffffff;
+
+    -fx-background-radius: 12;
+
+    -fx-border-color: #a8dddd;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+
+    -fx-padding: 8;
+
+    -fx-effect:
+        dropshadow(
+            gaussian,
+            rgba(0, 70, 70, 0.18),
+            8,
+            0.15,
+            0,
+            3
+        );
+}
+
+
+/* ==========================================================
+   TEXTO DE LAS TARJETAS
+   ========================================================== */
+
+.ventana-semanal .metrica .label {
+    -fx-text-fill: #124f50;
+}
+
+.ventana-semanal .metrica .label:first-child {
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #124f50;
+}
+
+.ventana-semanal .metrica .label:last-child {
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #197776;
+}
+
+
+/* ==========================================================
+   BOTONES DE ACCIÓN DE LAS TARJETAS
+   ========================================================== */
+
+.ventana-semanal .accion-semanal {
+    -fx-background-color: #d8f4f3;
+
+    -fx-text-fill: #087b79;
+
+    -fx-border-color: #8dd4d2;
+    -fx-border-width: 1;
+
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+
+    -fx-padding: 6 8 6 8;
+
+    -fx-min-width: 38px;
+    -fx-pref-width: 38px;
+    -fx-max-width: 38px;
+}
+
+.ventana-semanal .accion-semanal:hover {
+    -fx-background-color: #b8e9e7;
+    -fx-border-color: #58bdbb;
+}
+
+.ventana-semanal .accion-semanal:pressed {
+    -fx-background-color: #8dd4d2;
+}
+
+
+/* ==========================================================
+   BOTÓN "NUEVA ACTIVIDAD"
+   ========================================================== */
+
+.ventana-semanal .primario {
+    -fx-background-color: #159c99;
+
+    -fx-text-fill: #ffffff;
+
+    -fx-font-weight: 700;
+
+    -fx-background-radius: 9;
+    -fx-border-radius: 9;
+
+    -fx-padding: 9 17 9 17;
+}
+
+.ventana-semanal .primario:hover {
+    -fx-background-color: #087f7d;
+}
+
+.ventana-semanal .primario:pressed {
+    -fx-background-color: #056765;
+}
+
+
+/* ==========================================================
+   TÍTULO "PLAN SEMANAL"
+   ========================================================== */
+
+.ventana-semanal .titulo-seccion {
+    -fx-font-family: "Segoe UI", sans-serif;
+
+    -fx-font-size: 22px;
+
+    -fx-font-weight: 700;
+
+    -fx-text-fill: #087b79;
+}
+
+
+/* ==========================================================
+   TEXTO GENERAL DE LA VENTANA
+   ========================================================== */
+
+.ventana-semanal .label {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-text-fill: #185c5d;
+}
+
+
+/* ==========================================================
+   ESTADO / CONTADOR
+   ========================================================== */
+
+.ventana-semanal #estado {
+    -fx-text-fill: #087b79;
+}
+
+
+/* ==========================================================
+   BARRAS DE DESPLAZAMIENTO
+   ========================================================== */
+
+.ventana-semanal .scroll-bar {
+    -fx-background-color: transparent;
+}
+
+.ventana-semanal .scroll-bar .track {
+    -fx-background-color: #cceeee;
+    -fx-background-radius: 8;
+}
+
+.ventana-semanal .scroll-bar .thumb {
+    -fx-background-color: #39aaa8;
+    -fx-background-radius: 8;
+}
+
+.ventana-semanal .scroll-bar .thumb:hover {
+    -fx-background-color: #178c89;
+}
+
+.ventana-semanal .scroll-bar .increment-button,
+.ventana-semanal .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
 }

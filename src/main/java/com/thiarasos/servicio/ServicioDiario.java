@@ -3,6 +3,8 @@ package com.thiarasos.servicio;
 import com.thiarasos.persistencia.EntradaDiario;
 import com.thiarasos.persistencia.ErrorPersistencia;
 import com.thiarasos.persistencia.RepositorioDiario;
+import com.thiarasos.persistencia.CumplimientoDiario;
+import java.util.List;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,7 +16,10 @@ public class ServicioDiario {
     public ServicioDiario(RepositorioDiario repositorio) {
         this.repositorio = repositorio;
     }
-
+    public List<CumplimientoDiario> listarCumplimientos(long actividadId) {
+        return repositorio.listarCumplimientos(actividadId);
+    }
+    
     public EntradaDiario crearEntrada(
             long actividadId,
             Long cumplimientoId,
