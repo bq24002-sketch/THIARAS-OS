@@ -73,7 +73,7 @@ final class PanelPrincipal {
 
     private double posicionInicialX;
     private double posicionInicialY;
-
+    private VentanaSemanal ventanaSemanal;
 
     PanelPrincipal(
             ServicioActividad servicio,
@@ -83,6 +83,21 @@ final class PanelPrincipal {
         this.servicioDiario = servicioDiario;
     }
 
+    private void abrirSemana() {
+        if (ventanaSemanal == null) {
+                ventanaSemanal = new VentanaSemanal(
+                servicio,
+                servicioDiario,
+                this::refrescar
+                );
+
+                ventanaSemanal.mostrar();
+
+                return;
+        }
+
+        ventanaSemanal.mostrar();
+    }
 
     private void cambiarFondo() {
 
@@ -146,7 +161,8 @@ final class PanelPrincipal {
         return new CabeceraPrincipal(
                 this::abrirFormulario,
                 this::refrescar,
-                this::cambiarFondo
+                this::cambiarFondo,
+                this::abrirSemana
         ).crear();
     }
 

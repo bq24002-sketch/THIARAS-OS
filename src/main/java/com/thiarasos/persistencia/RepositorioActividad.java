@@ -51,8 +51,40 @@ public final class RepositorioActividad {
         this.proveedorConexion = proveedorConexion;
     }
 
-    public long iniciar(long actividadId) {
-        return ejecutarFuncionConResultado("SELECT iniciar_actividad(?)", actividadId);
+    
+public long iniciar(long actividadId) {
+    return ejecutarFuncionConResultado(
+            "SELECT iniciar_actividad(?)",
+            actividadId
+    );
+}
+
+public long iniciar(long actividadId, LocalDate fecha) {
+    String sql = "SELECT iniciar_actividad_en_fecha(?, ?)";
+
+    try (var conexion = proveedorConexion.abrir();
+         PreparedStatement consulta = conexion.prepareStatement(sql)) {
+
+        consulta.setLong(1, actividadId);
+        consulta.setObject(2, fecha);
+
+        try (ResultSet resultado = consulta.executeQuery()) {
+           if (!resultado.next()) {
+                throw new ErrorPersistencia(
+                "La función no devolvió un ID de cumplimiento.",
+            new IllegalStateException("La función SQL no devolvió ninguna fila.")
+        );
+    }
+
+            return resultado.getLong(1);
+        }
+
+    } catch (SQLException e) {
+        throw new ErrorPersistencia(
+                "No se pudo iniciar la actividad en la fecha indicada",
+                e
+            );
+        }
     }
 
     public long completar(long actividadId) {
@@ -90,7 +122,37 @@ public final class RepositorioActividad {
 
             return List.copyOf(actividades);
         } catch (SQLException e) {
-            throw new ErrorPersistencia("No se pudieron cargar las actividades", e);
+            throw new ErrorPersistencia("No se pudieron cargar las actividades", 
+            e
+            );
+        }
+    }
+
+    public List<ActividadSemanal> listarSemana() {
+        String sql = ConsultaSql.cargar("34_actividades_semana.sql");
+
+        try (var conexion = proveedorConexion.abrir();
+             PreparedStatement consulta = conexion.prepareStatement(sql);
+             ResultSet resultado = consulta.executeQuery()) {
+
+            List<ActividadSemanal> actividades = new ArrayList<>();
+
+            while (resultado.next()) {
+                actividades.add(new ActividadSemanal(
+                        resultado.getLong("id"),
+                        resultado.getString("titulo"),
+                        resultado.getString("materia"),
+                        resultado.getObject("fecha", LocalDate.class),
+                        resultado.getObject("hora", LocalTime.class),
+                        obtenerEntero(resultado, "duracion_minutos"),
+                        resultado.getBoolean("recurrente"),
+                        resultado.getString("estado")
+                ));
+            }
+
+            return List.copyOf(actividades);
+        } catch (SQLException e) {
+            throw new ErrorPersistencia("No se pudieron cargar las actividades de la semana", e);
         }
     }
 
@@ -144,6 +206,7 @@ public final class RepositorioActividad {
         );
     }
 }
+
  public boolean existeConflictoHorario(NuevaActividad actividad) {
     return existeConflictoHorario(actividad, null);
 }

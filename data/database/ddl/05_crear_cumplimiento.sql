@@ -97,3 +97,6 @@ CREATE INDEX idx_cumplimiento_actividad_fecha
         actividad_id,
         fecha
     );
+CREATE UNIQUE INDEX uq_cumplimiento_actividad_en_progreso
+ON cumplimiento_actividad (actividad_id)
+WHERE estado = 'EN_PROGRESO';

@@ -17,6 +17,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import com.thiarasos.persistencia.CumplimientoDiario;
+import javafx.scene.control.ComboBox;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -335,6 +337,19 @@ public class VentanaDiario {
 
         DatePicker fecha =
                 new DatePicker(LocalDate.now());
+
+        Label etiquetaCumplimiento =
+                new Label("Realización asociada:");
+
+        ComboBox<CumplimientoDiario> selectorCumplimiento =
+                new ComboBox<>();
+
+        selectorCumplimiento.getItems().addAll(
+                servicioDiario.listarCumplimientos(actividadId)
+        );
+
+        selectorCumplimiento.getSelectionModel().clearSelection();
+        selectorCumplimiento.setPromptText("Sin asociar");    
 
         Label etiquetaContenido = new Label(
                 "¿Qué quieres escribir?"
